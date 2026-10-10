@@ -1,0 +1,92 @@
+import heroBurger from "@/assets/hero-burger.jpg";
+import pasta from "@/assets/recipe-pasta.jpg";
+import cake from "@/assets/recipe-cake.jpg";
+import bowl from "@/assets/recipe-bowl.jpg";
+import greenPasta from "@/assets/green-pasta.jpeg.asset.json";
+import steakAndFries from "@/assets/steak-and-fries.jpeg.asset.json";
+import glazedChicken from "@/assets/glazed-chicken.jpeg.asset.json";
+import crispyPotatoes from "@/assets/crispy-potatoes.jpeg.asset.json";
+import beefStirFry from "@/assets/beef-stir-fry.jpeg.asset.json";
+import stickyDatePudding from "@/assets/sticky-date-pudding.jpeg.asset.json";
+import creamySalmon from "@/assets/creamy-salmon.jpeg.asset.json";
+import mushroomTagliatelle from "@/assets/mushroom-tagliatelle.jpeg.asset.json";
+
+export const recipes = [
+  { id: 7, title: "Green goddess pasta with tomatoes", category: "Lunch", time: "25 min", image: greenPasta.url, description: "A bright, herby pasta with juicy tomatoes, greens and a shower of parmesan.", ingredients: ["Fusilli pasta", "Cherry tomatoes", "Baby spinach", "Fresh basil", "Parmesan", "Olive oil", "Garlic"], method: "Cook the pasta in salted water until al dente, saving a mug of the cooking water. Sizzle garlic in olive oil, then toss in the tomatoes until softened. Add the spinach, basil and pasta with a splash of cooking water, and finish with grated parmesan." },
+  { id: 8, title: "Chimichurri steak & parmesan fries", category: "Dinner", time: "45 min", image: steakAndFries.url, description: "Seared steak, golden fries and a punchy green herb sauce for a proper dinner.", ingredients: ["Steak", "Potatoes", "Parmesan", "Flat-leaf parsley", "Garlic", "Red wine vinegar", "Olive oil"], method: "Cut the potatoes into fries, toss with oil and roast at 220°C until crisp, then scatter over parmesan. Finely chop the parsley and garlic and mix with vinegar and olive oil for the chimichurri. Season and sear the steak to your liking, rest it, then slice and serve with the fries and sauce." },
+  { id: 9, title: "Glazed chicken with sweet potato mash", category: "Dinner", time: "40 min", image: glazedChicken.url, description: "Juicy roasted chicken with silky sweet potato mash and tender green vegetables.", ingredients: ["Chicken thighs", "Sweet potatoes", "Carrots", "Green beans", "Honey", "Butter", "Smoked paprika"], method: "Rub the chicken with paprika and a little oil, then roast at 200°C until cooked through, brushing with honey near the end. Boil the sweet potatoes until tender and mash with butter. Roast the carrots and briefly steam the green beans, then serve everything together with the pan juices." },
+  { id: 10, title: "Crispy potatoes with herby dressing", category: "Lunch", time: "40 min", image: crispyPotatoes.url, description: "Golden-edged potatoes tossed in a lively, garlicky herb dressing.", ingredients: ["Baby potatoes", "Flat-leaf parsley", "Garlic", "Olive oil", "Lemon", "Chilli flakes"], method: "Parboil the potatoes until just tender, drain well and rough up their edges. Roast with olive oil at 220°C until golden and crisp. Mix chopped parsley, garlic, lemon juice and chilli flakes, then spoon over the hot potatoes." },
+  { id: 11, title: "Sticky beef & peppers rice bowl", category: "Dinner", time: "30 min", image: beefStirFry.url, description: "Tender beef, colourful peppers and sesame over fluffy rice.", ingredients: ["Beef strips", "Rice", "Red peppers", "Green beans", "Soy sauce", "Honey", "Sesame seeds"], method: "Cook the rice according to the packet. Sear the beef quickly in a hot pan and set aside, then stir-fry the peppers and green beans. Return the beef with soy sauce and honey, toss until glossy and serve over rice with sesame seeds." },
+  { id: 12, title: "Warm date pudding with vanilla ice cream", category: "Dessert", time: "55 min", image: stickyDatePudding.url, description: "A soft, sticky little pudding with melting vanilla ice cream on top.", ingredients: ["Pitted dates", "Plain flour", "Brown sugar", "Butter", "Eggs", "Baking soda", "Vanilla ice cream"], method: "Soak chopped dates in hot water with baking soda until soft. Cream butter and sugar, beat in the eggs, then fold in flour and the dates. Bake in greased ramekins at 180°C until a skewer comes out clean, and serve warm with vanilla ice cream." },
+  { id: 13, title: "Creamy chicken with asparagus", category: "Dinner", time: "35 min", image: creamySalmon.url, description: "Golden chicken in a savoury cream sauce with asparagus and buttery mash.", ingredients: ["Chicken breasts", "Asparagus", "Potatoes", "Cream", "Shallot", "Smoked paprika", "Butter"], method: "Boil the potatoes and mash with butter. Season the chicken with paprika and sear until golden and cooked through. Soften the shallot, add cream and simmer briefly; steam the asparagus and serve everything with the sauce." },
+  { id: 14, title: "Creamy mushroom tagliatelle", category: "Dinner", time: "30 min", image: mushroomTagliatelle.url, description: "Silky ribbons of pasta with golden mushrooms and plenty of parmesan.", ingredients: ["Tagliatelle", "Mushrooms", "Garlic", "Cream", "Parmesan", "Fresh thyme"], method: "Cook the tagliatelle until al dente, reserving some pasta water. Brown the mushrooms in a wide pan, then stir in garlic and thyme. Add cream and a splash of pasta water, toss with the pasta and finish with parmesan." },
+  { id: 1, title: "The really good homemade burger", category: "Dinner", time: "35 min", image: heroBurger, description: "A juicy, feel-good burger with all the little things that make it unforgettable.", ingredients: ["Brioche buns", "Ground beef", "Cheddar", "Lettuce & tomato", "Red onion", "Burger sauce"], method: "Season and sear the patties until golden. Melt the cheddar on top, toast the buns, then layer with sauce and fresh vegetables." },
+  { id: 2, title: "Creamy tomato & basil pasta", category: "Dinner", time: "25 min", image: pasta, description: "A weeknight bowl of comfort, finished with parmesan and plenty of basil.", ingredients: ["Penne pasta", "Cherry tomatoes", "Cream", "Garlic", "Fresh basil", "Parmesan"], method: "Cook the pasta until al dente. Simmer garlic and tomatoes, stir in cream, then toss everything together with basil and parmesan." },
+  { id: 3, title: "Strawberry cloud cake", category: "Dessert", time: "1 hr 15 min", image: cake, description: "Soft vanilla sponge, strawberry cream, and a little celebration in every slice.", ingredients: ["Vanilla sponge", "Fresh strawberries", "Whipping cream", "Sugar", "Vanilla"], method: "Layer cooled sponge with whipped strawberry cream and sliced berries. Chill before slicing and top with more fresh strawberries." },
+  { id: 4, title: "Green goddess chicken bowl", category: "Lunch", time: "30 min", image: bowl, description: "Fresh, filling, colorful, and generously drizzled with herby dressing.", ingredients: ["Chicken breast", "Grains", "Avocado", "Roasted vegetables", "Mixed greens", "Herb dressing"], method: "Roast the vegetables and cook the chicken. Assemble with warm grains, greens and avocado, then spoon over the herb dressing." },
+  { id: 5, title: "Slow Sunday burger", category: "Weekend", time: "40 min", image: heroBurger, description: "The kind of laid-back lunch worth making a whole afternoon of.", ingredients: ["Brioche buns", "Beef patties", "Cheese", "Tomatoes", "Lettuce"], method: "Sear patties, toast the buns and stack generously with your favorite toppings." },
+  { id: 6, title: "Sunday tomato pasta", category: "Weekend", time: "30 min", image: pasta, description: "A simple table-sharing favorite with a sunny tomato sauce.", ingredients: ["Pasta", "Tomatoes", "Garlic", "Basil", "Parmesan"], method: "Cook pasta and simmer tomatoes with garlic. Toss together and finish with basil and parmesan." },
+] as const;
+
+export type Recipe = (typeof recipes)[number];
+export const categories = ["All recipes", "Lunch", "Dinner", "Dessert", "Weekend"];
+export const categoryTiles = [
+  { label: "Everyday dinners", sub: "The end-of-day favorites", image: pasta, category: "Dinner" },
+  { label: "Sweet things", sub: "A little something lovely", image: cake, category: "Dessert" },
+  { label: "Fresh & feel-good", sub: "Brighten your plate", image: bowl, category: "Lunch" },
+];
+
+export const recipeSlug = (recipe: Recipe) => recipe.title.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+export const findRecipe = (slug: string) => recipes.find((recipe) => recipeSlug(recipe) === slug);
+export const popularIngredients = ["Garlic", "Tomatoes", "Basil", "Parmesan", "Chicken", "Avocado", "Strawberries", "Cheddar", "Brioche"];
+
+export const baseServings = 4;
+/** Quantities for baseServings, aligned with each recipe's ingredients. */
+const amounts: Record<number, [number, string][]> = {
+  7: [[400, "g"], [250, "g"], [120, "g"], [1, "handful"], [60, "g"], [3, "tbsp"], [2, "cloves"]],
+  8: [[4, "steaks"], [800, "g"], [60, "g"], [1, "bunch"], [2, "cloves"], [2, "tbsp"], [4, "tbsp"]],
+  9: [[4, ""], [800, "g"], [4, ""], [300, "g"], [2, "tbsp"], [40, "g"], [2, "tsp"]],
+  10: [[800, "g"], [1, "bunch"], [2, "cloves"], [4, "tbsp"], [1, ""], [1, "tsp"]],
+  11: [[500, "g"], [300, "g"], [2, ""], [200, "g"], [4, "tbsp"], [2, "tbsp"], [2, "tbsp"]],
+  12: [[200, "g"], [180, "g"], [120, "g"], [100, "g"], [2, ""], [1, "tsp"], [4, "scoops"]],
+  13: [[4, "fillets"], [300, "g"], [800, "g"], [200, "ml"], [1, ""], [1, ""], [40, "g"]],
+  14: [[400, "g"], [400, "g"], [2, "cloves"], [200, "ml"], [60, "g"], [4, "sprigs"]],
+  1: [[4, ""], [600, "g"], [4, "slices"], [1, "head / 2"], [1, ""], [120, "ml"]],
+  2: [[400, "g"], [300, "g"], [200, "ml"], [3, "cloves"], [1, "handful"], [60, "g"]],
+  3: [[2, "layers"], [400, "g"], [400, "ml"], [80, "g"], [2, "tsp"]],
+  4: [[4, ""], [250, "g"], [2, ""], [500, "g"], [120, "g"], [150, "ml"]],
+  5: [[4, ""], [4, ""], [4, "slices"], [2, ""], [1, "head"]],
+  6: [[400, "g"], [500, "g"], [3, "cloves"], [1, "handful"], [60, "g"]],
+};
+const fmt = (n: number) => (n >= 10 ? Math.round(n) : Math.round(n * 4) / 4).toString().replace(/\.25$/, "¼").replace(/\.5$/, "½").replace(/\.75$/, "¾").replace(/^0(?=[¼½¾])/, "");
+export function scaledIngredients(recipe: Recipe, servings: number) {
+  const list = amounts[recipe.id] ?? [];
+  return recipe.ingredients.map((name, i) => {
+    const a = list[i];
+    return { name, amount: a ? `${fmt((a[0] * servings) / baseServings)}${a[1] ? " " + a[1] : ""}` : "" };
+  });
+}
+
+/** Flexible swaps: keyword -> alternatives. */
+const swapTable: [string, string][] = [
+  ["beef", "turkey mince, lentil patties or mushrooms"],
+  ["chicken", "tofu, chickpeas or salmon"],
+  ["cream", "Greek yogurt, coconut milk or cashew cream"],
+  ["parmesan", "pecorino or nutritional yeast"],
+  ["cheddar", "gouda, vegan cheese or halloumi"],
+  ["pasta", "wholewheat, gluten-free pasta or courgette ribbons"],
+  ["penne", "any short pasta or gluten-free penne"],
+  ["brioche", "sourdough rolls, lettuce wraps or gluten-free buns"],
+  ["grains", "quinoa, brown rice or couscous"],
+  ["sugar", "honey, maple syrup or less sugar"],
+  ["strawberries", "raspberries, mango or peaches"],
+  ["basil", "spinach, rocket or parsley"],
+  ["avocado", "hummus or edamame"],
+  ["mushrooms", "courgette or aubergine"],
+  ["potatoes", "sweet potatoes or cauliflower"],
+  ["rice", "quinoa or cauliflower rice"],
+  ["dates", "dried figs or prunes"],
+];
+export function recipeSwaps(recipe: Recipe) {
+  return recipe.ingredients.flatMap((ing) => { const hit = swapTable.find(([k]) => ing.toLowerCase().includes(k)); return hit ? [{ ingredient: ing, swap: hit[1] }] : []; });
+}
