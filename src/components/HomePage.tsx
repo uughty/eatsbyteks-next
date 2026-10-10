@@ -421,9 +421,9 @@ const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert']
 
 /* Replace each '#' with your real profile link. */
 const FOOTER_SOCIALS = [
-  { label: 'Instagram', href: '#' },
-  { label: 'YouTube', href: '#' },
-  { label: 'TikTok', href: '#' },
+  { label: 'Instagram', href: 'https://www.instagram.com/eatsbyteks_/' },
+  { label: 'TikTok', href: 'https://tr.ee/dVG7zg4CMu' },
+  { label: 'YouTube', href: 'https://tr.ee/6U-ToT3P2Z' },
 ]
 function SiteFooter() {
   const year = 2026

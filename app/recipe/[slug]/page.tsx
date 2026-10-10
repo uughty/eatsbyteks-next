@@ -31,10 +31,9 @@ const GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/></svg>\")"
 
 const FOOTER_SOCIALS = [
-  { label: 'Instagram', href: '#' },
-  { label: 'TikTok', href: '#' },
-  { label: 'YouTube', href: '#' },
-  { label: 'Pinterest', href: '#' },
+  { label: 'Instagram', href: 'https://www.instagram.com/eatsbyteks_/' },
+  { label: 'TikTok', href: 'https://tr.ee/dVG7zg4CMu' },
+  { label: 'YouTube', href: 'https://tr.ee/6U-ToT3P2Z' },
 ]
 
 const FOOTER_EXPLORE = [

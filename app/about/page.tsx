@@ -41,8 +41,11 @@ const WAYS = [
   { icon: Heart, title: 'Clear, step-by-step method', text: 'Short steps in the order you actually cook them.' },
   { icon: Users, title: 'Made to share', text: 'Dishes sized and seasoned for the whole table.' },
 ]
-
-const SOCIALS = ['Instagram', 'TikTok', 'YouTube', 'Pinterest']
+const SOCIALS = [
+  { label: 'Instagram', href: 'https://www.instagram.com/eatsbyteks_/' },
+  { label: 'TikTok', href: 'https://www.google.com' },
+  { label: 'YouTube', href: 'https://tr.ee/6U-ToT3P2Z' },
+]
 
 const iconWrap = 'grid size-12 shrink-0 place-items-center rounded-full border border-[#123222]/30 text-[#123222]'
 const rule = (
@@ -62,10 +65,10 @@ const GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/></svg>\")"
 
 const FOOTER_SOCIALS = [
-  { label: 'Instagram', href: '#' },
-  { label: 'TikTok', href: '#' },
-  { label: 'YouTube', href: '#' },
-  { label: 'Pinterest', href: '#' },
+  { label: 'Instagram', href: 'https://www.instagram.com/eatsbyteks_/' },
+  { label: 'TikTok', href: 'https://tr.ee/dVG7zg4CMu' },
+  { label: 'YouTube', href: 'https://tr.ee/6U-ToT3P2Z' },
+
 ]
 
 const FOOTER_EXPLORE = [
@@ -385,13 +388,18 @@ export default function AboutPage() {
               </ul>
 
               <ul data-g="hero-in" className="mt-8 flex flex-wrap gap-2">
-                {SOCIALS.map((s) => (
-                  <li key={s}>
-                    <a href="#" className="inline-flex rounded-full border border-[#2f6a45]/40 px-4 py-1.5 text-sm font-semibold text-[#123222] transition-colors hover:bg-[#2f6a45] hover:text-white">
-                      {s}
-                    </a>
-                  </li>
-                ))}
+               {SOCIALS.map((s) => (
+  <li key={s.label}>
+  <a
+  href={s.href}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex rounded-full border border-white/25 px-4 py-1.5 text-sm text-[#f4efd8] transition-colors hover:border-[#fbf6c8] hover:text-[#fbf6c8]"
+>
+  {s.label}
+</a>
+  </li>
+))}
               </ul>
             </div>
           </section>
