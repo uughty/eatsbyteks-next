@@ -388,26 +388,25 @@ export const recipes = [
     method:
       "Cook the rice and warm the black beans. Season the chicken with taco spices, sear until cooked and slice. Mix the tomatoes, red onion and lime into a quick pico de gallo. Build the bowls with rice, beans, chicken, avocado and chips, and finish with sour cream.",
   },
-{
-  id: 21,
-  title: "Pan-seared fish with caramelized onion sauce",
-  category: "Dinner",
-  time: "30 min",
-  image: A("caramelized-onion.jpeg"),
-  description:
-    "Golden pan-seared white fish served with rich, sweet caramelized onions and tender green beans on the side.",
-  ingredients: [
-    "White fish fillets",
-    "Yellow onions",
-    "Garlic",
-    "Green beans",
-    "Butter",
-    "Olive oil",
-    "Fresh thyme",
-    "Salt",
-    "Black pepper",
-  ],
-
+  {
+    id: 21,
+    title: "Pan-seared fish with caramelized onion sauce",
+    category: "Dinner",
+    time: "30 min",
+    image: A("caramelized-onion.jpeg"),
+    description:
+      "Golden pan-seared white fish served with rich, sweet caramelized onions and tender green beans on the side.",
+    ingredients: [
+      "White fish fillets",
+      "Yellow onions",
+      "Garlic",
+      "Green beans",
+      "Butter",
+      "Olive oil",
+      "Fresh thyme",
+      "Salt",
+      "Black pepper",
+    ],
     method:
       "Pat the fish dry, season and sear skin-side down until crisp, then flip briefly. Caramelize the onions in butter with garlic and thyme, add the cream and simmer. Steam the green beans and serve everything together.",
   },
@@ -534,27 +533,27 @@ export const recipes = [
     method:
       "Brown the onions deeply, add garlic, pilau masala and the beef and simmer until tender. Add the potatoes and rinsed rice with enough water to cover, then cook covered on low heat until the rice is fluffy. Serve with kachumbari on the side.",
   },
- {
-  id: 28,
-  title: "Githeri with avocado and feta",
-  category: "Salad",
-  time: "25 min",
-  image: A("githeri.jpeg"),
-  description:
-    "A hearty Kenyan githeri salad tossed with creamy avocado, crumbled feta, fresh tomatoes and red onion.",
-  ingredients: [
-    "Githeri (maize and beans)",
-    "Avocado",
-    "Cherry tomatoes",
-    "Red onion",
-    "Feta",
-    "Mixed greens",
-    "Olive oil",
-    "Lemon",
-  ],
-  method:
-    "Combine the cooked githeri with chopped tomatoes and thinly sliced red onion. Drizzle with olive oil and fresh lemon juice, then toss gently. Add sliced avocado, crumbled feta and mixed greens before serving.",
-},
+  {
+    id: 28,
+    title: "Githeri with avocado and feta",
+    category: "Salad",
+    time: "25 min",
+    image: A("githeri.jpeg"),
+    description:
+      "A hearty Kenyan githeri salad tossed with creamy avocado, crumbled feta, fresh tomatoes and red onion.",
+    ingredients: [
+      "Githeri (maize and beans)",
+      "Avocado",
+      "Cherry tomatoes",
+      "Red onion",
+      "Feta",
+      "Mixed greens",
+      "Olive oil",
+      "Lemon",
+    ],
+    method:
+      "Combine the cooked githeri with chopped tomatoes and thinly sliced red onion. Drizzle with olive oil and fresh lemon juice, then toss gently. Add sliced avocado, crumbled feta and mixed greens before serving.",
+  },
   {
     id: 29,
     title: "Creamy mushroom soup with ciabatta",
@@ -617,26 +616,26 @@ export const recipes = [
       "Simmer the goat until tender, then fry with onions and tomatoes until browned. Sauté the greens with garlic and stir in the cream. Boil water, beat in the maize flour until stiff and smooth, and serve the ugali with the goat and greens.",
   },
   {
-  id: 32,
-  title: "Kenyan kaimati",
-  category: "Breakfast",
-  time: "45 min",
-  image: A("kaimati.jpeg"),
-  description:
-    "Golden, crispy Swahili kaimati with soft, fluffy centres, coated in a sweet, sticky sugar syrup for a delicious coastal treat.",
-  ingredients: [
-    "All-purpose flour",
-    "Plain yoghurt",
-    "Instant yeast",
-    "Sugar",
-    "Warm water",
-    "Cooking oil",
-    "Cardamom",
-    "Water for syrup",
-  ],
-  method:
-    "Mix the flour, yeast, sugar and cardamom in a bowl. Add yoghurt and enough warm water to make a thick, smooth batter. Cover and leave to rise for 30–45 minutes. Heat oil in a deep pan, then carefully drop small portions of batter into the hot oil. Fry until puffed up and golden brown, turning occasionally for even cooking. In a separate saucepan, simmer sugar and a little water until syrupy. Toss the fried kaimati in the warm syrup until coated, then serve.",
-},
+    id: 32,
+    title: "Kenyan kaimati",
+    category: "Breakfast",
+    time: "45 min",
+    image: A("kaimati.jpeg"),
+    description:
+      "Golden, crispy Swahili kaimati with soft, fluffy centres, coated in a sweet, sticky sugar syrup for a delicious coastal treat.",
+    ingredients: [
+      "All-purpose flour",
+      "Plain yoghurt",
+      "Instant yeast",
+      "Sugar",
+      "Warm water",
+      "Cooking oil",
+      "Cardamom",
+      "Water for syrup",
+    ],
+    method:
+      "Mix the flour, yeast, sugar and cardamom in a bowl. Add yoghurt and enough warm water to make a thick, smooth batter. Cover and leave to rise for 30–45 minutes. Heat oil in a deep pan, then carefully drop small portions of batter into the hot oil. Fry until puffed up and golden brown, turning occasionally for even cooking. In a separate saucepan, simmer sugar and a little water until syrupy. Toss the fried kaimati in the warm syrup until coated, then serve.",
+  },
   {
     id: 33,
     title: "Flan (crème caramel)",
@@ -657,30 +656,29 @@ export const recipes = [
       "Melt the sugar into a golden caramel and pour into the base of a mould. Blend the eggs, milks and vanilla, strain over the caramel and bake in a water bath at 160°C until just set. Chill well, then turn out to serve.",
   },
   {
-  id: 34,
-  title: "Kenyan githeri with caramelized onions",
-  category: "Lunch",
-  time: "45 min",
-  image: A("githeri.jpeg"),
-  description:
-    "A hearty Kenyan classic of maize and beans simmered with tomatoes, onions and aromatic spices, finished with sweet caramelized onions and fresh coriander.",
-  ingredients: [
-    "Boiled maize",
-    "Boiled beans",
-    "Red onions",
-    "Tomatoes",
-    "Garlic",
-    "Cooking oil",
-    "Curry powder",
-    "Paprika",
-    "Salt",
-    "Black pepper",
-    "Fresh coriander",
-  ],
-  method:
-    "Heat oil in a pan and cook the sliced onions until golden and caramelized. Add garlic, chopped tomatoes and spices, then cook until the tomatoes soften into a rich sauce. Stir in the boiled maize and beans, season with salt and black pepper, and simmer for 15–20 minutes. Garnish with fresh coriander and serve warm.",
-},
- 
+    id: 34,
+    title: "Coconut fish curry",
+    category: "Dinner",
+    time: "40 min",
+    image: A("coconut-fish-curry.jpeg"),
+    description:
+      "Tender white fish simmered in a creamy, gently spiced coconut and tomato sauce, finished with lime and fresh coriander.",
+    ingredients: [
+      "White fish fillets",
+      "Coconut milk",
+      "Onion",
+      "Tomatoes",
+      "Garlic",
+      "Ginger",
+      "Curry powder",
+      "Turmeric",
+      "Lime",
+      "Fresh coriander",
+      "Cooking oil",
+    ],
+    method:
+      "Fry the sliced onion in oil until soft and golden, then add the garlic, ginger, curry powder and turmeric. Stir in the chopped tomatoes and cook down into a thick sauce. Pour in the coconut milk and simmer for 10 minutes. Slide in the fish and cook gently for 8 to 10 minutes until just cooked through. Finish with lime juice and fresh coriander.",
+  },
   {
     id: 36,
     title: "Carrot and apple spice cake",
@@ -904,6 +902,88 @@ export const recipes = [
     method:
       "Whisk the eggs and sugar until thick and pale, fold in the flour and bake in a lined tray at 190°C for about 10 minutes. Roll the warm sponge in baking paper and cool. Unroll, spread with whipped cream, lay a strip of mango along one edge, re-roll and chill before slicing.",
   },
+  {
+    id: 49,
+    title: "Kenyan chapati",
+    category: "Dinner",
+    time: "1 hr",
+    image: A("kenyan-chapati.jpeg"),
+    description:
+      "Soft, flaky, layered flatbread cooked on a hot pan, perfect for scooping up stews.",
+    ingredients: [
+      "Plain flour",
+      "Warm water",
+      "Vegetable oil",
+      "Salt",
+      "Sugar",
+    ],
+    method:
+      "Mix the flour, salt and sugar, then knead with the warm water and 2 tablespoons of oil into a soft, smooth dough. Cover and rest for 30 minutes. Divide into balls, roll each out thin, brush with oil, roll into a rope and coil it up like a snail. Rest for 10 minutes, then roll flat again. Cook on a hot dry pan, brushing with oil and flipping until golden with brown spots.",
+  },
+  {
+    id: 50,
+    title: "Cardamom-coconut mahamri",
+    category: "Breakfast",
+    time: "1 hr 30 min",
+    image: A("cardamom-coconut-mahamri.jpeg"),
+    description:
+      "Fluffy, golden Swahili doughnut triangles scented with cardamom and coconut.",
+    ingredients: [
+      "Plain flour",
+      "Coconut milk",
+      "Sugar",
+      "Instant yeast",
+      "Ground cardamom",
+      "Desiccated coconut",
+      "Vegetable oil",
+    ],
+    method:
+      "Mix the flour, sugar, yeast, cardamom and desiccated coconut, then knead with warm coconut milk into a soft dough. Cover and let it rise for about an hour until doubled. Roll out, cut into triangles and rest for 10 minutes. Fry in hot oil until puffed and golden brown, turning once, then drain on paper towels.",
+  },
+  {
+    id: 51,
+    title: "Coconut beans",
+    category: "Lunch",
+    time: "45 min",
+    image: A("coconut-beans.jpeg"),
+    description:
+      "Tender kidney beans simmered in a creamy, lightly spiced coconut and tomato sauce.",
+    ingredients: [
+      "Cooked kidney beans",
+      "Coconut milk",
+      "Onion",
+      "Tomatoes",
+      "Garlic",
+      "Curry powder",
+      "Fresh coriander",
+      "Cooking oil",
+    ],
+    method:
+      "Fry the chopped onion in oil until soft and golden, then add the garlic and curry powder. Stir in the chopped tomatoes and cook down into a thick sauce. Add the beans and coconut milk and simmer gently for 20 minutes until creamy. Season and finish with fresh coriander.",
+  },
+  {
+    id: 52,
+    title: "Goat biryani",
+    category: "Dinner",
+    time: "2 hr",
+    image: A("goat-biryani.jpeg"),
+    description:
+      "Fragrant layers of spiced goat and basmati rice, steamed low and slow.",
+    ingredients: [
+      "Goat meat",
+      "Basmati rice",
+      "Onions",
+      "Tomatoes",
+      "Plain yoghurt",
+      "Garlic",
+      "Ginger",
+      "Biryani masala",
+      "Fresh coriander",
+      "Cooking oil",
+    ],
+    method:
+      "Marinate the goat in yoghurt, garlic, ginger and half the masala for at least an hour. Brown the sliced onions in oil, add the goat and tomatoes and simmer until the meat is tender. Parboil the rice until three-quarters cooked. Layer the rice over the goat, scatter with coriander, cover tightly and steam on very low heat for 25 minutes before gently mixing.",
+  },
 ] as const;
 
 export type Recipe = (typeof recipes)[number];
@@ -1103,7 +1183,7 @@ const amounts: Record<number, [number, string][]> = {
   18: [[8, ""], [400, "g"], [2, ""], [4, "cloves"], [1, "tbsp"], [2, "tsp"], [1, "tsp"], [1, "handful"], [4, ""]],
   19: [[4, ""], [800, "g"], [250, "g"], [2, ""], [40, "g"], [2, "tbsp"], [1, "tsp"]],
   20: [[500, "g"], [250, "g"], [400, "g"], [2, ""], [3, ""], [1, ""], [1, ""], [1, "handful"], [4, "tbsp"]],
-  21: [[4, "fillets"], [250, "g"], [150, "ml"], [2, "cloves"], [250, "g"], [30, "g"], [4, "sprigs"]],
+  21: [[4, "fillets"], [250, "g"], [2, "cloves"], [250, "g"], [30, "g"], [2, "tbsp"], [4, "sprigs"], [1, "pinch"], [1, "pinch"]],
   22: [[0.5, "head"], [3, ""], [1, ""], [1, "handful"], [60, "g"], [2, "tbsp"], [3, "tbsp"], [2, "tbsp"], [1, ""]],
   23: [[800, "g"], [200, "g"], [5, ""], [400, "ml"], [2, "tbsp"], [2, "tsp"]],
   24: [[24, ""], [500, "g"], [4, ""], [100, "g"], [300, "ml"], [2, "tbsp"]],
@@ -1114,10 +1194,9 @@ const amounts: Record<number, [number, string][]> = {
   29: [[500, "g"], [1, ""], [2, "cloves"], [750, "ml"], [150, "ml"], [4, "sprigs"], [1, "loaf"], [30, "g"]],
   30: [[300, "g"], [400, "ml"], [80, "g"], [0.5, "tsp"], [2, ""], [1, "tbsp"]],
   31: [[500, "g"], [800, "g"], [2, ""], [3, ""], [500, "g"], [100, "ml"], [3, "cloves"], [3, "tbsp"]],
-  32: [[8, "slices"], [200, "g"], [3, ""], [200, "g"], [50, "g"], [4, "sprigs"]],
+  32: [[300, "g"], [200, "g"], [2, "tsp"], [3, "tbsp"], [150, "ml"], [500, "ml"], [1, "tsp"], [100, "ml"]],
   33: [[150, "g"], [4, ""], [400, "g"], [350, "ml"], [250, "ml"], [2, "tsp"]],
-  34: [[800, "g"], [400, "g"], [4, ""], [200, "g"], [4, "cloves"], [3, "tbsp"], [1, ""], [1, "handful"]],
-  35: [[250, "g"], [500, "ml"], [2, ""], [30, "g"], [2, "tsp"], [4, "tbsp"], [1, ""]],
+  34: [[600, "g"], [400, "ml"], [1, ""], [2, ""], [3, "cloves"], [1, "tbsp"], [2, "tsp"], [1, "tsp"], [1, ""], [1, "handful"], [2, "tbsp"]],
   36: [[250, "g"], [2, ""], [250, "g"], [200, "g"], [3, ""], [150, "ml"], [2, "tsp"], [200, "g"], [100, "g"]],
   37: [[400, "g"], [300, "g"], [200, "g"], [2, ""], [100, "ml"], [2, "tsp"], [50, "g"], [100, "g"]],
   38: [[600, "g"], [400, "g"], [2, ""], [3, "cloves"], [400, "g"], [2, "tsp"], [300, "g"], [1, "handful"], [4, "tbsp"]],
@@ -1129,8 +1208,10 @@ const amounts: Record<number, [number, string][]> = {
   44: [[400, "g"], [2, "stalks"], [2, "slices"], [6, ""], [200, "g"], [2, "tbsp"], [2, ""], [2, ""], [1, "l"], [1, "handful"]],
   45: [[8, ""], [250, "ml"], [150, "ml"], [4, "tbsp"], [1, "tsp"], [2, "tbsp"], [1, "tsp"]],
   46: [[4, ""], [100, "g"], [100, "g"], [300, "ml"], [2, ""], [2, "tbsp"]],
-  47: [[4, ""], [100, "g"], [100, "g"], [300, "ml"], [2, ""], [2, "tbsp"]],
-  48: [[400, "g"], [500, "g"], [400, "g"], [2, ""], [4, "cloves"], [2, "tbsp"], [2, ""], [1, "bowl"], [2, "tbsp"]],
+  49: [[500, "g"], [300, "ml"], [6, "tbsp"], [1, "tsp"], [1, "tbsp"]],
+  50: [[500, "g"], [250, "ml"], [80, "g"], [2, "tsp"], [2, "tsp"], [30, "g"], [500, "ml"]],
+  51: [[500, "g"], [400, "ml"], [1, ""], [2, ""], [3, "cloves"], [1, "tsp"], [1, "handful"], [2, "tbsp"]],
+  52: [[800, "g"], [400, "g"], [3, ""], [3, ""], [200, "g"], [4, "cloves"], [1, "tbsp"], [2, "tbsp"], [1, "handful"], [4, "tbsp"]],
 };
 
 const fmt = (n: number) =>

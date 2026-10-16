@@ -5,7 +5,7 @@ import { SiteLayout } from '@/components/SiteLayout'
 import { AboutMotion } from '@/components/AboutMotion'
 
 export const metadata: Metadata = {
-  title: 'Our Story | EatsByTeks',
+  title: 'About Us | EatsByTeks',
   description:
     'Meet Chef Olive Tekeiwa and the kitchen behind EatsByTeks: simple, generous cooking and the joy of eating together.',
   openGraph: {
@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 const CHEF_PHOTO = '/assets/chef.jpeg'
 const PLATE = '/assets/recipe-cake.jpg'
 const BOWL = '/assets/recipe-bowl.jpg'
+const COOKING = '/assets/lamb.chops.jpeg' /* Olive at the stove, a different shot from the cake */
 
 /*
   Palette
@@ -41,12 +42,24 @@ const WAYS = [
   { icon: Heart, title: 'Clear, step-by-step method', text: 'Short steps in the order you actually cook them.' },
   { icon: Users, title: 'Made to share', text: 'Dishes sized and seasoned for the whole table.' },
 ]
+
+const EQUIPMENT = [
+  { name: 'Cast iron skillet', img: '/assets/equipment-skillet.jpg' },
+  { name: "Chef's knife", img: '/assets/equipment-knife.jpg' },
+  { name: 'Stand mixer', img: '/assets/equipment-mixer.jpg' },
+  { name: 'Dutch oven', img: '/assets/equipment-dutch-oven.jpg' },
+  { name: 'Wooden spoons', img: '/assets/equipment-spoons.jpg' },
+  { name: 'Cake tins', img: '/assets/equipment-tins.jpg' },
+]
+
 const SOCIALS = [
   { label: 'Instagram', href: 'https://www.instagram.com/eatsbyteks_/' },
   { label: 'TikTok', href: 'https://www.google.com' },
   { label: 'YouTube', href: 'https://tr.ee/6U-ToT3P2Z' },
 ]
 
+const card = 'border border-[#123222]/10 bg-white p-3 pb-6 shadow-[0_20px_40px_-30px_rgba(18,50,34,0.4)]'
+const caption = 'mt-5 text-center text-[15px] text-[#123222]'
 const iconWrap = 'grid size-12 shrink-0 place-items-center rounded-full border border-[#123222]/30 text-[#123222]'
 const rule = (
   <span aria-hidden="true" className="mt-3 flex items-center gap-2">
@@ -353,10 +366,11 @@ export default function AboutPage() {
           </nav>
 
           <section className="mt-8 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <div data-g="photo" className="overflow-hidden rounded-[2.5rem] shadow-[0_40px_80px_-40px_rgba(18,50,34,0.55)]">
-              <div className="aspect-[4/5] overflow-hidden rounded-[2.5rem]">
+            <div data-g="photo" className={card}>
+              <div className="aspect-[4/5] overflow-hidden">
                 <img data-g="hero-img" src={CHEF_PHOTO} alt="Chef Olive Tekeiwa" className="size-full object-cover" />
               </div>
+              <p className={caption}>Chef Olive Tekeiwa</p>
             </div>
 
             <div>
@@ -408,8 +422,11 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-5 pt-24 lg:px-8">
           {/* WHY WE GATHER */}
           <section className="grid items-center gap-10 md:grid-cols-2 md:gap-20">
-            <div data-g="fade" className="aspect-[4/5] overflow-hidden rounded-[2.5rem] shadow-[0_40px_80px_-40px_rgba(18,50,34,0.6)]">
-              <img data-g="par" src={PLATE} alt="Strawberry cake ready to share" className="h-[118%] w-full object-cover" />
+            <div data-g="fade" className={card}>
+              <div className="aspect-[4/5] overflow-hidden">
+                <img data-g="par" src={PLATE} alt="Strawberry cake ready to share" className="h-[118%] w-full object-cover" />
+              </div>
+              <p className={caption}>Strawberry cake, ready to share</p>
             </div>
             <div>
               <p data-g="fade" className="font-display text-xl italic text-[#2f6a45]">Why we gather</p>
@@ -513,16 +530,48 @@ export default function AboutPage() {
                 <Words text="Good food doesn’t need to be complicated. It just needs to be shared." />
               </blockquote>
               <p data-g="fade" className="mt-5 text-sm font-semibold text-[#2f6a45]">Chef Olive Tekeiwa</p>
+              <p data-g="fade" className="mt-6 max-w-md text-sm leading-relaxed text-[#123222]/75">
+                Olive keeps every recipe honest: simple ingredients, clear steps and the patience to taste as you go.
+                If a dish can’t be cooked the same way twice, it doesn’t make it onto the page.
+              </p>
             </div>
 
-            <div data-g="fade" className="relative aspect-[5/4] overflow-hidden rounded-[2.5rem]">
-              <img data-g="par" src={PLATE} alt="" loading="lazy" className="h-[118%] w-full object-cover" />
-              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#123222]/85 via-transparent to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-8 text-[#f6f1c4]">
-                <p className="font-display text-3xl italic text-[#fbf8dc]">Olive T.</p>
-                <p className="text-sm text-[#e4f0d9]">Chef and founder, EatsByTeks</p>
+            <div data-g="fade" className={card}>
+              <div className="aspect-[5/4] overflow-hidden">
+                <img data-g="par" src={COOKING} alt="Chef Olive cooking at the stove" loading="lazy" className="h-[118%] w-full object-cover" />
               </div>
+              <p className={caption}>Olive at the stove, testing a recipe</p>
             </div>
+          </section>
+
+          {/* MY KITCHEN EQUIPMENT */}
+          <section data-g="fade" className="mt-24 border-t border-[#123222]/20 pt-14">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-display text-3xl text-[#123222]">My kitchen equipment</h2>
+              <Link
+                href="/recipes"
+                className="inline-flex items-center gap-2 rounded-full bg-[#2f6a45] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#123222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123222] focus-visible:ring-offset-2"
+              >
+                View all <ArrowRight size={16} />
+              </Link>
+            </div>
+            {rule}
+
+            <ul data-g="stagger" className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {EQUIPMENT.map(({ name, img }) => (
+                <li key={name} className={card}>
+                  <div className="aspect-[3/4] overflow-hidden">
+                    <img
+                      src={img}
+                      alt={name}
+                      loading="lazy"
+                      className="size-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                  </div>
+                  <p className={caption}>{name}</p>
+                </li>
+              ))}
+            </ul>
           </section>
 
           {/* HOW WE COOK */}
@@ -555,8 +604,11 @@ export default function AboutPage() {
                 Explore recipes made for real life, from bright bowls to slow Sunday comforts.
               </p>
             </div>
-            <div data-g="fade" className="aspect-[5/4] overflow-hidden rounded-[2rem]">
-              <img data-g="par" src={BOWL} alt="Colorful chicken bowl" loading="lazy" className="h-[118%] w-full object-cover" />
+            <div data-g="fade" className={card}>
+              <div className="aspect-[5/4] overflow-hidden">
+                <img data-g="par" src={BOWL} alt="Colorful chicken bowl" loading="lazy" className="h-[118%] w-full object-cover" />
+              </div>
+              <p className={caption}>Colorful chicken bowl</p>
             </div>
           </section>
 

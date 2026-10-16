@@ -31,6 +31,11 @@ const primaryBtn =
 const lightBtn =
   'inline-flex items-center justify-center gap-2 rounded-full bg-[#f6f1c4] px-6 py-3 text-sm font-semibold text-[#123222] transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
+/* White bordered card with an inset photo and a caption underneath */
+const card = 'border border-[#123222]/10 bg-white p-3 pb-5 shadow-[0_20px_40px_-30px_rgba(18,50,34,0.4)]'
+const meta = 'mt-2 flex items-center justify-center gap-3 text-xs text-[#123222]/60'
+const tag = 'rounded-full bg-[#eaf3df] px-2.5 py-0.5 font-semibold text-[#2f6a45]'
+
 const TILE_SPANS = [
   'md:col-span-4 md:row-span-2',
   'md:col-span-2',
@@ -619,7 +624,7 @@ function RecipesContent() {
                 <p className="mt-2 max-w-md text-sm text-[#123222]/70">Choose a category to see its meals.</p>
               </Reveal>
 
-              <div className="mt-8 grid auto-rows-[15rem] gap-5 md:grid-cols-6 md:auto-rows-[14rem]">
+              <div className="mt-8 grid auto-rows-[22rem] gap-5 md:grid-cols-6 md:auto-rows-[19rem]">
                 {categoryTiles.map((tile, i) => {
                   const n = countFor(tile.category)
                   return (
@@ -627,28 +632,24 @@ function RecipesContent() {
                       <button
                         type="button"
                         onClick={() => goToCategory(tile.category)}
-                        className="group relative size-full overflow-hidden rounded-[2rem] bg-[#123222] text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#2f6a45]/50"
+                        className={`group relative flex size-full flex-col text-left transition-transform duration-500 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#2f6a45]/50 ${card}`}
                       >
-                        <img
-                          src={tile.image}
-                          alt=""
-                          loading="lazy"
-                          className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        <div
-                          aria-hidden="true"
-                          className="absolute inset-0 bg-gradient-to-t from-[#123222]/90 via-[#123222]/25 to-transparent"
-                        />
-                        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6 sm:p-7">
-                          <div>
-                            <h3 className="font-display text-2xl text-[#fbf8dc] sm:text-3xl">{tile.label}</h3>
-                            <p className="mt-1 text-sm text-[#d4e8cc]">
-                              {tile.sub} · {n} {n === 1 ? 'recipe' : 'recipes'}
-                            </p>
-                          </div>
-                          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f6f1c4] text-[#123222] transition-transform group-hover:translate-x-1">
+                        <div className="relative min-h-0 flex-1 overflow-hidden bg-[#d7e9c8]">
+                          <img
+                            src={tile.image}
+                            alt=""
+                            loading="lazy"
+                            className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                          <span className="absolute bottom-3 right-3 grid size-10 place-items-center rounded-full bg-[#f6f1c4] text-[#123222] transition-transform group-hover:translate-x-1">
                             <ArrowRight size={18} />
                           </span>
+                        </div>
+                        <div className="pt-4 text-center">
+                          <h3 className="font-display text-xl text-[#123222] sm:text-2xl">{tile.label}</h3>
+                          <p className="mt-1 text-xs text-[#123222]/60">
+                            {tile.sub} · {n} {n === 1 ? 'recipe' : 'recipes'}
+                          </p>
                         </div>
                       </button>
                     </Reveal>
@@ -673,14 +674,14 @@ function RecipesContent() {
                     const isSaved = saved.includes(recipe.id)
                     return (
                       <Reveal key={recipe.id} delay={(i % 3) * 90} className="h-full">
-                        <article className="group flex h-full flex-col overflow-hidden rounded-[2rem] bg-white shadow-[0_24px_50px_-32px_rgba(18,50,34,0.55)] ring-1 ring-[#d3e5c5] transition-shadow hover:shadow-[0_30px_60px_-28px_rgba(18,50,34,0.65)]">
-                          <div className="relative m-3 overflow-hidden rounded-[1.5rem] bg-[#d7e9c8]">
-                            <Link href={`/recipe/${recipeSlug(recipe)}`} tabIndex={-1} aria-hidden="true">
+                        <article className={`group flex h-full flex-col transition-shadow hover:shadow-[0_30px_60px_-28px_rgba(18,50,34,0.65)] ${card}`}>
+                          <div className="relative aspect-[4/5] overflow-hidden bg-[#d7e9c8]">
+                            <Link href={`/recipe/${recipeSlug(recipe)}`} tabIndex={-1} aria-hidden="true" className="block size-full">
                               <img
                                 src={recipe.image}
                                 alt={recipe.title}
                                 loading="lazy"
-                                className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
                               />
                             </Link>
                             <span className="absolute bottom-3 left-3 rounded-full bg-[#f6f1c4] px-3 py-1 text-xs font-semibold text-[#123222]">
@@ -700,16 +701,18 @@ function RecipesContent() {
                             </button>
                           </div>
 
-                          <div className="flex flex-1 flex-col px-6 pb-6 pt-2">
-                            <h3 className="font-display text-2xl leading-tight text-[#123222]">{recipe.title}</h3>
-                            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#123222]/70">
+                          <div className="flex flex-1 flex-col px-2 pt-4">
+                            <h3 className="text-center font-display text-2xl leading-tight text-[#123222]">{recipe.title}</h3>
+                            <p className="mt-2 line-clamp-2 text-center text-sm leading-relaxed text-[#123222]/70">
                               {recipe.description}
                             </p>
-                            <p className="mt-4 inline-flex items-center gap-2 text-sm text-[#123222]/70">
-                              <Clock3 size={15} className="text-[#2f6a45]" />
-                              {recipe.time} · {recipe.ingredients.length} ingredients
+                            <p className={meta}>
+                              <span className="inline-flex items-center gap-1.5">
+                                <Clock3 size={13} className="text-[#2f6a45]" /> {recipe.time}
+                              </span>
+                              <span>{recipe.ingredients.length} ingredients</span>
                             </p>
-                            <div className="mt-auto flex items-center justify-between gap-3 pt-6">
+                            <div className="mt-auto flex items-center justify-between gap-3 pt-5">
                               <Link href={`/recipe/${recipeSlug(recipe)}`} className={primaryBtn}>
                                 View recipe <ArrowRight size={15} />
                               </Link>
@@ -806,22 +809,23 @@ function RecipesContent() {
                     <Link
                       key={recipe.id}
                       href={`/recipe/${recipeSlug(recipe)}`}
-                      className="group w-64 shrink-0 snap-start overflow-hidden rounded-[1.8rem] bg-white p-2.5 shadow-[0_20px_40px_-28px_rgba(18,50,34,0.6)] ring-1 ring-[#d3e5c5] sm:w-72"
+                      className={`group w-64 shrink-0 snap-start sm:w-72 ${card}`}
                     >
-                      <div className="overflow-hidden rounded-[1.4rem]">
+                      <div className="aspect-[4/5] overflow-hidden">
                         <img
                           src={recipe.image}
-                          alt=""
+                          alt={recipe.title}
                           loading="lazy"
-                          className="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       </div>
-                      <div className="px-3 pb-3 pt-4">
-                        <h3 className="font-display text-xl leading-tight text-[#123222]">{recipe.title}</h3>
-                        <p className="mt-2 inline-flex items-center gap-2 text-sm text-[#123222]/70">
-                          <Clock3 size={14} className="text-[#2f6a45]" /> {recipe.time}
-                        </p>
-                      </div>
+                      <h3 className="mt-4 text-center font-display text-xl leading-snug text-[#123222]">{recipe.title}</h3>
+                      <p className={meta}>
+                        <span className={tag}>{recipe.category}</span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Clock3 size={13} className="text-[#2f6a45]" /> {recipe.time}
+                        </span>
+                      </p>
                     </Link>
                   ))}
                 </div>

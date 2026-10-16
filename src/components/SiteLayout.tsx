@@ -12,8 +12,8 @@ import { useShoppingList } from '@/lib/useShoppingList'
 const links = [
   { to: '/', label: 'Home' },
   { to: '/recipes', label: 'Recipes' },
-  { to: '/collections', label: 'Collections' },
-  { to: '/about', label: 'Our story' },
+  
+  { to: '/about', label: 'About' },
   { to: '/kenyan-food', label: 'Kenyan Dishes' },
 ]
 

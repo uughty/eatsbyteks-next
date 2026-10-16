@@ -19,9 +19,10 @@ export const metadata: Metadata = {
 
 /* The Kenyan dishes, by recipe id in lib/recipes, in the order they appear:
    27 Kenyan pilau · 31 Ugali with goat fry · 28 Githeri with avocado and feta
-   34 Kenyan githeri with caramelized onions · 41 Mandazi · 32 Kenyan kaimati
+   34 Coconut fish curry · 41 Mandazi · 32 Kenyan kaimati
+   49 Kenyan chapati · 50 Cardamom-coconut mahamri · 51 Coconut beans · 52 Goat biryani
    Add a new Kenyan recipe? Put its id in this list. */
-const KENYAN_IDS = [27, 31, 28, 34, 41, 32]
+const KENYAN_IDS = [27, 31, 28, 34, 41, 32, 49, 50, 51, 52]
 
 const STAPLES = [
   { name: 'Ugali', text: 'Firm maize-meal staple, eaten with stews and greens.' },
@@ -297,6 +298,12 @@ const darkBtn =
 const ghostBtn =
   'inline-flex items-center gap-2 rounded-full border border-[#123222]/50 px-7 py-3 text-sm font-semibold text-[#123222] transition-colors hover:bg-[#123222]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123222]'
 
+/* White bordered card with an inset photo and a caption underneath */
+const card = 'border border-[#123222]/10 bg-white p-3 pb-5 shadow-[0_20px_40px_-30px_rgba(18,50,34,0.4)]'
+const caption = 'mt-4 text-center text-[15px] text-[#123222]'
+const meta = 'mt-2 flex items-center justify-center gap-3 text-xs text-[#123222]/60'
+const tag = 'rounded-full bg-[#eaf3df] px-2.5 py-0.5 font-semibold text-[#2f6a45]'
+
 export default function KenyanPage() {
   const list = KENYAN_IDS.map((id) => recipes.find((r) => r.id === id)).filter((r): r is Recipe => Boolean(r))
   const [hero, second, third] = list
@@ -331,7 +338,7 @@ export default function KenyanPage() {
                   <Words text="Kenyan kitchen" kind="hword" />
                 </h1>
                 <p data-g="hero-in" className="mt-6 max-w-md text-base leading-relaxed text-[#123222]/75">
-                  Pilau, githeri, ugali with goat fry, mandazi and kaimati: home-style Kenyan dishes, cooked in a real
+                  Pilau, githeri, chapati, goat biryani, mahamri and more: home-style Kenyan dishes, cooked in a real
                   kitchen and written down step by step.
                 </p>
                 <div data-g="hero-in" className="mt-8 flex flex-wrap gap-3">
@@ -345,14 +352,15 @@ export default function KenyanPage() {
               </div>
 
               {hero && (
-                <Link href={`/recipe/${recipeSlug(hero)}`} data-g="photo" className="group relative mx-auto block w-full max-w-lg">
-                  <div className="rounded-full bg-[#f6f1c4] p-3 shadow-[0_50px_90px_-40px_rgba(18,50,34,0.7)]">
-                    <img data-g="hero-img" src={hero.image} alt={hero.title} className="aspect-square w-full rounded-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <Link href={`/recipe/${recipeSlug(hero)}`} data-g="photo" className={`group mx-auto block w-full max-w-md ${card}`}>
+                  <div className="aspect-[4/5] overflow-hidden">
+                    <img data-g="hero-img" src={hero.image} alt={hero.title} className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   </div>
-                  <span className="absolute -bottom-3 left-4 inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-xs font-semibold text-[#123222] shadow-xl sm:left-10">
-                    <Clock3 size={16} className="text-[#2f6a45]" />
-                    <span>{hero.title}<span className="block font-normal text-[#123222]/60">{hero.time}</span></span>
-                  </span>
+                  <p className={caption}>{hero.title}</p>
+                  <p className={meta}>
+                    <span className={tag}>{hero.category}</span>
+                    <span className="inline-flex items-center gap-1.5"><Clock3 size={13} className="text-[#2f6a45]" /> {hero.time}</span>
+                  </p>
                 </Link>
               )}
             </div>
@@ -365,8 +373,11 @@ export default function KenyanPage() {
                 <Words text="Cook this first" />
               </h2>
               <div data-g="fade" className={`mt-10 grid items-center gap-8 overflow-hidden rounded-[2.5rem] p-6 sm:p-10 lg:grid-cols-[0.9fr_1.1fr] ${panel}`}>
-                <div className="mx-auto w-full max-w-sm rounded-full bg-[#f6f1c4] p-2.5 shadow-[0_40px_70px_-35px_rgba(18,50,34,0.7)]">
-                  <img src={featured.image} alt={featured.title} loading="lazy" className="aspect-square w-full rounded-full object-cover" />
+                <div className={`mx-auto w-full max-w-sm ${card}`}>
+                  <div className="aspect-[4/5] overflow-hidden">
+                    <img src={featured.image} alt={featured.title} loading="lazy" className="size-full object-cover" />
+                  </div>
+                  <p className={caption}>{featured.title}</p>
                 </div>
                 <div>
                   <span className="inline-flex rounded-full bg-[#123222] px-3 py-1 text-xs font-semibold text-[#f6f1c4]">{featured.category}</span>
@@ -385,25 +396,32 @@ export default function KenyanPage() {
 
           {/* ALL DISHES */}
           <section id="dishes" className="mt-24 scroll-mt-24">
-            <h2 id="latest-heading" data-g="split" className="text-center font-display text-4xl text-[#123222] sm:text-5xl">
-              <Words text="Every Kenyan dish" />
-            </h2>
+            <div className="flex items-center justify-between gap-4">
+              <h2 id="latest-heading" data-g="split" className="font-display text-4xl text-[#123222] sm:text-5xl">
+                <Words text="Every Kenyan dish" />
+              </h2>
+              <Link
+                href="/recipes"
+                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#2f6a45] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#123222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123222] focus-visible:ring-offset-2"
+              >
+                View all <ArrowRight size={16} />
+              </Link>
+            </div>
 
             <div data-g="stagger" className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((r) => (
                 <Link
                   key={r.id}
                   href={`/recipe/${recipeSlug(r)}`}
-                  className={`group flex flex-col items-center rounded-[2rem] p-6 text-center transition-transform duration-500 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f6a45] ${panel}`}
+                  className={`group block transition-transform duration-500 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f6a45] ${card}`}
                 >
-                  <div className="w-44 rounded-full bg-[#f6f1c4] p-2 shadow-[0_30px_50px_-30px_rgba(18,50,34,0.7)]">
-                    <img src={r.image} alt={r.title} loading="lazy" className="aspect-square w-full rounded-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="aspect-[4/5] overflow-hidden">
+                    <img src={r.image} alt={r.title} loading="lazy" className="size-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   </div>
-                  <h3 className="mt-6 font-display text-2xl leading-tight text-[#123222]">{r.title}</h3>
-                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#123222]/75">{r.description}</p>
-                  <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#123222]">
-                    <Clock3 size={15} className="text-[#2f6a45]" /> {r.time}
-                    <span className="ml-2 inline-flex items-center gap-1 text-[#2f6a45]">View <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" /></span>
+                  <h3 className="mt-4 text-center font-display text-xl leading-snug text-[#123222]">{r.title}</h3>
+                  <p className={meta}>
+                    <span className={tag}>{r.category}</span>
+                    <span className="inline-flex items-center gap-1.5"><Clock3 size={13} className="text-[#2f6a45]" /> {r.time}</span>
                   </p>
                 </Link>
               ))}
@@ -442,8 +460,11 @@ export default function KenyanPage() {
                 </div>
               </div>
               {third && (
-                <div className="mx-auto w-full max-w-xs rounded-full bg-[#f6f1c4] p-2.5 shadow-[0_40px_70px_-35px_rgba(18,50,34,0.7)]">
-                  <img src={third.image} alt={third.title} loading="lazy" className="aspect-square w-full rounded-full object-cover" />
+                <div className={`mx-auto w-full max-w-xs ${card}`}>
+                  <div className="aspect-[4/5] overflow-hidden">
+                    <img src={third.image} alt={third.title} loading="lazy" className="size-full object-cover" />
+                  </div>
+                  <p className={caption}>{third.title}</p>
                 </div>
               )}
             </div>
