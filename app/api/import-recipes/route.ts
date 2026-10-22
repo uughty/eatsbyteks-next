@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
+const supabaseAdmin = getSupabaseAdmin()
+supabaseAdmin.from('recipes')
 import { recipes } from '@/lib/recipes'
 
 function createSlug(title: string) {
