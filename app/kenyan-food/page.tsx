@@ -33,6 +33,21 @@ const STAPLES = [
   { name: 'Mandazi', text: 'Lightly sweet fried dough, good with tea.' },
 ]
 
+const EQUIPMENT = [
+  {
+    name: 'Heavy-bottomed sufuria',
+    text: 'Holds steady heat for stews, pilau and githeri, so nothing catches at the bottom.',
+  },
+  {
+    name: 'Wooden mwiko',
+    text: 'Sturdy enough to stir ugali until it pulls cleanly away from the pot.',
+  },
+  {
+    name: 'Flat chapati pan',
+    text: 'A wide, flat pan for cooking chapati and mandazi until golden on both sides.',
+  },
+]
+
 /*
   Palette
   forest #123222 · moss #2f6a45 · sage #8fb88a · mint #cfe3c0 · butter #f6f1c4
@@ -438,6 +453,33 @@ export default function KenyanPage() {
                 <li key={s.name} className="border-b border-[#123222]/20 pb-5">
                   <p className="font-display text-2xl text-[#123222]">{s.name}</p>
                   <p className="mt-1 text-sm leading-relaxed text-[#123222]/75">{s.text}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* KITCHEN EQUIPMENT */}
+          <section
+            data-g="fade"
+            aria-labelledby="equipment-heading"
+            className="mt-24 overflow-hidden rounded-[2.5rem] bg-[#2f6a45] px-6 py-12 text-white sm:px-12"
+          >
+            <h2
+              id="equipment-heading"
+              data-g="split"
+              className="text-center font-display text-3xl sm:text-4xl"
+            >
+              <Words text="My kitchen equipments" />
+            </h2>
+
+            <ul data-g="stagger" className="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-8">
+              {EQUIPMENT.map((item) => (
+                <li key={item.name} className="flex flex-col items-center text-center">
+                  <Leaf tone="a" className="h-9 w-auto" />
+                  <p className="mt-4 font-display text-lg">{item.name}</p>
+                  <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/75">
+                    {item.text}
+                  </p>
                 </li>
               ))}
             </ul>
