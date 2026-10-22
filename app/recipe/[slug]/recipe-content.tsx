@@ -24,6 +24,8 @@ import type { Recipe } from '@/lib/recipes'
 import { useRecipeShelf } from '@/lib/useRecipeShelf'
 
 
+
+
 /* ------------------------------------------------------------------ */
 /* Footer                                                              */
 /* ------------------------------------------------------------------ */
@@ -50,7 +52,7 @@ const FOOTER_EXPLORE = [
 ]
 
 
-const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Salad']
+const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked Goods']
 
 
 const PILLARS = [

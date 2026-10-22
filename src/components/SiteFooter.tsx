@@ -30,7 +30,7 @@ const FOOTER_EXPLORE = [
   { label: 'Shopping list', href: '/shoppinglist' },
 ]
 
-const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Salad']
+const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked Goods']
 
 const PILLARS = [
   { label: 'Tested in a real kitchen' },

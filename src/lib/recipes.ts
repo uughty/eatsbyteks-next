@@ -1,7 +1,19 @@
 /* Images live in public/assets, so they are plain paths (no imports). */
 const A = (file: string) => `/assets/${file}`;
+export type Recipe = {
+  id: number
+  slug?: string
+  title: string
+  category: 'Breakfast' | 'Lunch' | 'Dinner' | 'Dessert' |  'Baked Goods'
+  time: string
+  image: string
+  description: string
+  ingredients: string[]
+  method: string
+}
 
-export const recipes = [
+export const recipes: Recipe[] = [
+
   {
     id: 7,
     title: "Green goddess pasta with tomatoes",
@@ -219,7 +231,7 @@ export const recipes = [
   {
     id: 4,
     title: "Green goddess chicken bowl",
-    category: "Salad",
+    category: "Baked Goods",
     time: "30 min",
     image: A("recipe-bowl.jpg"),
     description:
@@ -413,7 +425,7 @@ export const recipes = [
   {
     id: 22,
     title: "Rainbow crunch salad with peanut dressing",
-    category: "Salad",
+    category: "Baked Goods",
     time: "20 min",
     image: A("rainbow-crunch.jpeg"),
     description:
@@ -536,7 +548,7 @@ export const recipes = [
   {
     id: 28,
     title: "Githeri with avocado and feta",
-    category: "Salad",
+    category: "Baked Goods",
     time: "25 min",
     image: A("githeri.jpeg"),
     description:
@@ -984,17 +996,14 @@ export const recipes = [
     method:
       "Marinate the goat in yoghurt, garlic, ginger and half the masala for at least an hour. Brown the sliced onions in oil, add the goat and tomatoes and simmer until the meat is tender. Parboil the rice until three-quarters cooked. Layer the rice over the goat, scatter with coriander, cover tightly and steam on very low heat for 25 minutes before gently mixing.",
   },
-] as const;
-
-export type Recipe = (typeof recipes)[number];
-
+] 
 export const categories = [
   "All recipes",
   "Breakfast",
   "Lunch",
   "Dinner",
   "Dessert",
-  "Salad",
+  "Baked Goods",
 ];
 
 export const categoryTiles = [
@@ -1017,16 +1026,16 @@ export const categoryTiles = [
     category: "Dinner",
   },
   {
-    label: "Sweet things",
+    label: "Dessert",
     sub: "A little something lovely",
     image: A("recipe-cake.jpg"),
     category: "Dessert",
   },
   {
-    label: "Fresh & feel-good",
+    label: "Baked goods",
     sub: "Brighten your plate",
     image: A("recipe-bowl.jpg"),
-    category: "Salad",
+    category: "Baked Goods",
   },
 ];
 

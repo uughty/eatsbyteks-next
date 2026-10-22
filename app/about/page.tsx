@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { ArrowRight, ArrowUpRight, Cake, ChefHat, ChevronRight, Coffee, Heart, Plus, Salad, Soup, Users, Utensils } from 'lucide-react'
 import { SiteLayout } from '@/components/SiteLayout'
 import { AboutMotion } from '@/components/AboutMotion'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
 
 export const metadata: Metadata = {
   title: 'About Us | EatsByTeks',
@@ -33,7 +34,7 @@ const MENU = [
   { label: 'Lunch', icon: Soup },
   { label: 'Dinner', icon: Utensils },
   { label: 'Dessert', icon: Cake },
-  { label: 'Salad', icon: Salad },
+  { label: 'Baked Goods', icon: Breadcrumb },
 ]
 
 const WAYS = [
@@ -92,7 +93,7 @@ const FOOTER_EXPLORE = [
   { label: 'Shopping list', href: '/shopping-list' },
 ]
 
-const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Salad']
+const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked Goods']
 
 const PILLARS = [
   { label: 'Tested in a real kitchen' },
