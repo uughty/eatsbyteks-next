@@ -73,7 +73,7 @@ const FOOTER_EXPLORE = [
   { label: 'Recipes', href: '/recipes' },
   { label: 'Collections', href: '/collections' },
   { label: 'Our story', href: '/our-story' },
-  { label: 'Shopping list', href: '/shopping-list' },
+ 
 ]
 
 const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked Goods']
@@ -454,7 +454,7 @@ export default function KenyanPage() {
                   take it to the market.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/shopping-list" className={darkBtn}>Shopping list <ArrowRight size={16} /></Link>
+                  
                   <Link href="/recipes" className={ghostBtn}>Browse recipes</Link>
                 </div>
               </div>

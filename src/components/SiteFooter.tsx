@@ -27,7 +27,7 @@ const FOOTER_EXPLORE = [
   { label: 'Collections', href: '/collections' },
   { label: 'Our story', href: '/about' },
   { label: 'Kenyan dishes', href: '/kenyan-food' },
-  { label: 'Shopping list', href: '/shoppinglist' },
+ 
 ]
 
 const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked Goods']

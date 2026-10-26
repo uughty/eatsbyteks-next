@@ -89,7 +89,6 @@ const FOOTER_EXPLORE = [
   { label: 'Recipes', href: '/recipes' },
   { label: 'Collections', href: '/collections' },
   { label: 'Our story', href: '/our-story' },
-  { label: 'Shopping list', href: '/shopping-list' },
 ]
 
 const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked Goods']

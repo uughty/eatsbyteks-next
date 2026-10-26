@@ -7,7 +7,7 @@ import { Menu, X, ArrowUpRight, ArrowRight, ShoppingBasket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollMotion } from '@/components/ScrollMotion'
 import { BackToTop } from '@/components/BackToTop'
-import { useShoppingList } from '@/lib/useShoppingList'
+
 
 const links = [
   { to: '/', label: 'Home' },
@@ -27,8 +27,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
-  const { items } = useShoppingList()
-  const remaining = items.filter((i) => !i.done).length
+
+  const remaining = 0
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 12)
@@ -46,21 +46,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  const basket = (
-    <Link
-      href="/shopping-list"
-      onClick={() => setOpen(false)}
-      aria-label={`Shopping list, ${remaining} items`}
-      className="relative grid size-10 place-items-center rounded-full border border-[#123222]/30 text-[#123222] transition-colors hover:bg-[#123222] hover:text-[#f6f1c4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f6a45]"
-    >
-      <ShoppingBasket size={18} />
-      {remaining > 0 && (
-        <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#123222] px-1 text-[10px] font-bold text-[#f6f1c4]">
-          {remaining}
-        </span>
-      )}
-    </Link>
-  )
+  
 
   const mobileLinks = [...links, { to: '/shopping-list', label: 'Shopping list' }]
 
@@ -123,7 +109,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
           {/* actions */}
           <div className="hidden items-center justify-end gap-3 md:flex">
-            {basket}
+           
             <Button
               asChild
               size="sm"
@@ -135,19 +121,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
 
-          <div className="flex items-center justify-end gap-2 md:hidden">
-            {basket}
-            <button
-              type="button"
-              aria-label={open ? 'Close menu' : 'Open menu'}
-              aria-expanded={open}
-              aria-controls="mobile-menu"
-              onClick={() => setOpen(!open)}
-              className="grid size-10 place-items-center rounded-full text-[#123222] transition-colors hover:bg-[#123222]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f6a45]"
-            >
-              {open ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
+          
         </div>
 
         {/* mobile panel */}

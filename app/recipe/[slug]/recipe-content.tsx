@@ -16,7 +16,7 @@ import {
   Plus,
   Printer,
   Share2,
-  ShoppingBasket,
+ 
   Users,
 } from 'lucide-react'
 import { SiteLayout } from '@/components/SiteLayout'
@@ -537,10 +537,7 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
               </p>
 
               <div className="mt-10 flex items-center justify-between gap-3 border-b border-[#123222]/15 pb-3">
-                <h2 className="inline-flex items-center gap-2 font-display text-2xl text-[#123222]">
-                  <ShoppingBasket size={20} className="text-[#2f6a45]" />
-                  Ingredients
-                </h2>
+                
 
                 <div className="inline-flex items-center gap-1 rounded-full bg-white p-1 ring-1 ring-[#cfe3c0]">
                   <button
