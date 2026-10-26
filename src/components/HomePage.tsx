@@ -171,113 +171,18 @@ const BLEND_BAND: CSSProperties = {
 }
 
 /* ------------------------------------------------------------------ */
-/* Little inline illustrations (static)                                */
-/* ------------------------------------------------------------------ */
-
-type ArtProps = { className?: string; style?: CSSProperties }
-
-function Leaf({
-  className,
-  style,
-  tone = 'a',
-}: ArtProps & { tone?: 'a' | 'b' }) {
-  const fill = tone === 'a' ? '#6b9a3f' : '#4f7d2e'
-  return (
-    <svg
-      viewBox="0 0 100 140"
-      className={className}
-      style={style}
-      fill="none"
-      aria-hidden="true"
-    >
-      <path d="M50 4C88 30 98 84 50 136C2 84 12 30 50 4Z" fill={fill} />
-      <path
-        d="M50 4C88 30 98 84 50 136"
-        fill="#a6cc74"
-        fillOpacity="0.3"
-      />
-      <path
-        d="M50 14V132"
-        stroke="#2f5a1c"
-        strokeOpacity="0.45"
-        strokeWidth="2"
-      />
-      <path
-        d="M50 44L30 32M50 62L26 48M50 82L28 68M50 44L70 32M50 62L74 48M50 82L72 68"
-        stroke="#2f5a1c"
-        strokeOpacity="0.3"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
-function Lemon({ className, style }: ArtProps) {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      className={className}
-      style={style}
-      aria-hidden="true"
-    >
-      <circle cx="50" cy="50" r="48" fill="#f7b32b" />
-      <circle cx="50" cy="50" r="42" fill="#fff3c4" />
-      {Array.from({ length: 8 }).map((_, i) => (
-        <path
-          key={i}
-          d="M50 50L50 12A38 38 0 0 1 76.87 23.13Z"
-          transform={`rotate(${i * 45} 50 50)`}
-          fill="#fbd24e"
-          stroke="#fff3c4"
-          strokeWidth="2"
-        />
-      ))}
-    </svg>
-  )
-}
-
-function Tomato({ className, style }: ArtProps) {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      className={className}
-      style={style}
-      aria-hidden="true"
-    >
-      <circle cx="50" cy="56" r="38" fill="#e2452d" />
-      <ellipse
-        cx="37"
-        cy="42"
-        rx="11"
-        ry="6"
-        fill="#fff"
-        fillOpacity="0.35"
-        transform="rotate(-30 37 42)"
-      />
-      <path
-        d="M50 20l-13 9 11-2-4 11 9-8 9 8-4-11 11 2z"
-        fill="#4f7d2e"
-      />
-    </svg>
-  )
-}
-
-/* ------------------------------------------------------------------ */
 /* One dish: square photo beside its text, no card                     */
 /* ------------------------------------------------------------------ */
 
 function DishRow({
   recipe,
   flip,
-  accent,
   saved,
   onSave,
   onOpen,
 }: {
   recipe: Recipe
   flip: boolean
-  accent: number
   saved: boolean
   onSave: () => void
   onOpen: () => void
@@ -298,17 +203,6 @@ function DishRow({
               className={SQUARE_IMG}
             />
           </Link>
-
-          {/* A small leaf / lemon / tomato tucked into the corner */}
-          <div
-            className={`pointer-events-none absolute -top-4 z-10 w-12 lg:w-16 ${
-              flip ? '-left-3' : '-right-3'
-            }`}
-          >
-            {accent === 0 && <Leaf tone="a" className="h-auto w-full drop-shadow-md" />}
-            {accent === 1 && <Lemon className="h-auto w-full drop-shadow-md" />}
-            {accent === 2 && <Tomato className="h-auto w-full drop-shadow-md" />}
-          </div>
         </div>
 
         <div className={`lg:col-span-7 ${flip ? 'lg:order-1' : ''}`}>
@@ -369,23 +263,19 @@ function DishRow({
 const FOOTER_EXPLORE = [
   { label: 'Home', href: '/' },
   { label: 'All recipes', href: '/recipes' },
-  { label: 'Shopping list', href: '/shopping-list' },
 ]
 
 const FOOTER_CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert']
 
 const CONTACT_EMAIL = 'Eatsbyteks@gmail.com'
 
-/* NEWSLETTER: to collect real subscribers, create a free form endpoint (for
-   example Formspree, Buttondown or Mailchimp) and put its URL in
-   .env.local as NEXT_PUBLIC_NEWSLETTER_URL=https://...
-   Without it, "Join now" opens an email to CONTACT_EMAIL instead. */
-const NEWSLETTER_URL = process.env.NEXT_PUBLIC_NEWSLETTER_URL
+/* NEWSLETTER: "Join now" sends people to the EatsByTeks Substack. */
+const SUBSTACK_URL = 'https://substack.com/@eatsbyteks'
 
-/* Create these pages (or change the paths) for the legal links. */
+/* Legal PDFs: place these two files in your /public folder. */
 const FOOTER_LEGAL = [
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Terms of Service', href: '/terms' },
+  { label: 'Privacy Policy', href: '/EatsByTeks-Privacy-Policy.pdf' },
+  { label: 'Terms of Service', href: '/EatsByTeks-Terms-of-Service.pdf' },
 ]
 
 /* Replace each '#' with your real profile link. */
@@ -397,33 +287,15 @@ const FOOTER_SOCIALS = [
 function SiteFooter() {
   const year = 2026
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
+  const [agreed, setAgreed] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'done'>('idle')
 
-  const subscribe = async (e: FormEvent) => {
+  const subscribe = (e: FormEvent) => {
     e.preventDefault()
-    const address = email.trim()
-    if (!address) return
-
-    if (NEWSLETTER_URL) {
-      setStatus('sending')
-      try {
-        const res = await fetch(NEWSLETTER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ email: address }),
-        })
-        if (!res.ok) throw new Error('Request failed')
-        setEmail('')
-        setStatus('done')
-      } catch {
-        setStatus('error')
-      }
-      return
-    }
-
-    const subject = encodeURIComponent('Newsletter sign-up')
-    const body = encodeURIComponent(`Please add ${address} to the EatsByTeks newsletter.`)
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
+    if (!email.trim() || !agreed) return
+    window.open(SUBSTACK_URL, '_blank', 'noopener,noreferrer')
+    setEmail('')
+    setAgreed(false)
     setStatus('done')
   }
 
@@ -462,35 +334,6 @@ function SiteFooter() {
           aria-hidden="true"
           className="pointer-events-none absolute -right-24 bottom-0 size-[26rem] rounded-full bg-[#f7b32b]/10 blur-3xl"
         />
-
-        {/* botanicals */}
-        <div
-          data-speed="0.25"
-          data-x="-0.12"
-          data-rot="-30"
-          data-spin="0.03"
-          className="pointer-events-none absolute -right-6 top-6 w-24 opacity-90 will-change-transform lg:right-10 lg:w-40"
-        >
-          <Leaf tone="a" className="h-auto w-full drop-shadow-lg" />
-        </div>
-        <div
-          data-speed="-0.2"
-          data-x="0.12"
-          data-rot="14"
-          data-spin="0.06"
-          className="pointer-events-none absolute left-[6%] top-[38%] hidden w-14 will-change-transform lg:block"
-        >
-          <Lemon className="h-auto w-full drop-shadow-lg" />
-        </div>
-        <div
-          data-speed="0.18"
-          data-x="0.1"
-          data-rot="52"
-          data-spin="-0.03"
-          className="pointer-events-none absolute bottom-24 right-[30%] hidden w-16 opacity-70 will-change-transform lg:block"
-        >
-          <Leaf tone="b" className="h-auto w-full" />
-        </div>
 
         <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-6 sm:pt-10 lg:px-8">
           {/* Call to action */}
@@ -541,12 +384,10 @@ function SiteFooter() {
 
             {status === 'done' ? (
               <p role="status" className="font-display text-lg text-[#e8f7ee]">
-                {NEWSLETTER_URL
-                  ? "You're in! Look out for the next recipe in your inbox."
-                  : 'Almost there! Send the email that just opened to finish joining.'}
+                Almost there! Finish subscribing on Substack in the tab that just opened.
               </p>
             ) : (
-              <form onSubmit={subscribe} className="flex flex-col gap-3 sm:flex-row" noValidate={false}>
+              <form onSubmit={subscribe} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap" noValidate={false}>
                 <label htmlFor="footer-email" className="sr-only">
                   Email address
                 </label>
@@ -556,25 +397,50 @@ function SiteFooter() {
                   required
                   autoComplete="email"
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                    if (status === 'error') setStatus('idle')
-                  }}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address"
                   className="w-full flex-1 rounded-full bg-white px-5 py-3 text-sm text-[#1f4d3a] placeholder:text-[#1f4d3a]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee]"
                 />
                 <button
                   type="submit"
-                  disabled={status === 'sending'}
-                  className="rounded-full bg-[#16a05d] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#12894f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee] disabled:opacity-60"
+                  className="rounded-full bg-[#16a05d] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#12894f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee]"
                 >
-                  {status === 'sending' ? 'Joining…' : 'Join now'}
+                  Join now
                 </button>
-                {status === 'error' && (
-                  <p role="alert" className="text-sm text-[#ffd9d2] sm:basis-full">
-                    Something went wrong. Please try again.
-                  </p>
-                )}
+                <label
+                  htmlFor="footer-terms"
+                  className="flex items-start gap-3 text-sm leading-relaxed text-[#eef7f1]/80 sm:basis-full"
+                >
+                  <input
+                    id="footer-terms"
+                    type="checkbox"
+                    required
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="mt-1 size-4 shrink-0 accent-[#16a05d]"
+                  />
+                  <span>
+                    I agree to the{' '}
+                    <a
+                      href={FOOTER_LEGAL[1].href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#e8f7ee] underline underline-offset-4 hover:text-white"
+                    >
+                      Terms of Service
+                    </a>{' '}
+                    and{' '}
+                    <a
+                      href={FOOTER_LEGAL[0].href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#e8f7ee] underline underline-offset-4 hover:text-white"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </span>
+                </label>
               </form>
             )}
           </div>
@@ -646,10 +512,7 @@ function SiteFooter() {
               <h3 className="font-display text-lg text-[#e8f7ee]">How we cook</h3>
               <ul className="mt-4 space-y-3 text-sm text-[#eef7f1]/80">
                 {PILLARS.map((p) => (
-                  <li key={p.label} className="flex items-center gap-3">
-                    <Leaf tone="a" className="h-5 w-auto shrink-0" />
-                    {p.label}
-                  </li>
+                  <li key={p.label}>{p.label}</li>
                 ))}
               </ul>
             </div>
@@ -660,13 +523,15 @@ function SiteFooter() {
             <p>© {year} EatsByTeks. All recipes tested in our own kitchen.</p>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {FOOTER_LEGAL.map((l) => (
-                <Link
+                <a
                   key={l.label}
                   href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
                 >
                   {l.label}
-                </Link>
+                </a>
               ))}
               <a
                 href="#hero-heading"
@@ -772,11 +637,9 @@ export function HomePage() {
           />
 
           <div className="relative mx-auto flex min-h-[88vh] max-w-4xl flex-col items-center justify-center px-5 pb-24 pt-28 text-center lg:pt-32">
-            {/* small ornament */}
-            <div aria-hidden="true" className="flex items-center gap-4">
-              <span className="h-px w-14 bg-white/35" />
-              <Leaf tone="a" className="h-9 w-auto" />
-              <span className="h-px w-14 bg-white/35" />
+            {/* small ornament (line only) */}
+            <div aria-hidden="true" className="flex items-center">
+              <span className="h-px w-28 bg-white/35" />
             </div>
 
             <h1
@@ -885,13 +748,6 @@ export function HomePage() {
           aria-labelledby="featured-heading"
         >
           <div className="relative mx-auto max-w-7xl px-5 py-24 sm:py-32 lg:px-8">
-            <div className="pointer-events-none absolute -left-6 top-10 w-20 lg:left-2 lg:w-32">
-              <Leaf tone="b" className="h-auto w-full opacity-80" />
-            </div>
-            <div className="pointer-events-none absolute -right-4 bottom-8 w-20 lg:right-2 lg:w-36">
-              <Leaf tone="a" className="h-auto w-full opacity-80" />
-            </div>
-
             <div className="grid items-center gap-10 rounded-[2rem] bg-gradient-to-br from-[#e3f0e8] to-[#cfe3d6] px-6 py-12 sm:px-12 lg:grid-cols-12 lg:gap-12 lg:px-16 lg:py-20">
               <div className="lg:col-span-6">
                 <p className="text-base text-[#2e6a4f]">
@@ -1005,12 +861,6 @@ export function HomePage() {
                     >
                       {group.category}
                     </div>
-                    <div className="pointer-events-none absolute left-[4%] top-2 w-10 sm:w-14">
-                      <Leaf tone="a" className="h-auto w-full" />
-                    </div>
-                    <div className="pointer-events-none absolute bottom-2 right-[4%] w-10 sm:w-14">
-                      <Lemon className="h-auto w-full" />
-                    </div>
 
                     <div className="relative">
                       <h3 className="font-display text-3xl text-[#1f4d3a] sm:text-4xl">
@@ -1037,7 +887,6 @@ export function HomePage() {
                                 key={recipe.id}
                                 recipe={recipe}
                                 flip={n % 2 === 1}
-                                accent={n % 3}
                                 saved={saved.includes(recipe.id)}
                                 onSave={() => toggleSaved(recipe.id)}
                                 onOpen={() => setSelected(recipe)}
@@ -1054,20 +903,13 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* CLOSING: panel with a square photo and leaves */}
+        {/* CLOSING: panel with a square photo */}
         <section
           className="relative overflow-x-clip"
           style={PAPER}
           aria-labelledby="closing-heading"
         >
           <div className="relative mx-auto max-w-7xl px-5 pb-16 pt-8 sm:pb-20 lg:px-8">
-            <div className="pointer-events-none absolute -left-4 bottom-12 w-20 lg:left-0 lg:w-36">
-              <Leaf tone="a" className="h-auto w-full opacity-80" />
-            </div>
-            <div className="pointer-events-none absolute -right-4 top-4 w-20 lg:right-0 lg:w-32">
-              <Leaf tone="b" className="h-auto w-full opacity-80" />
-            </div>
-
             <div className="grid items-center gap-10 rounded-[2rem] bg-gradient-to-br from-[#e3f0e8] to-[#cfe3d6] px-6 py-12 sm:px-12 lg:grid-cols-12 lg:gap-12 lg:px-16 lg:py-16">
               <div className="lg:col-span-6">
                 <h2
@@ -1190,8 +1032,7 @@ export function HomePage() {
             <ul className="mt-10 grid gap-8 md:grid-cols-3">
               {KITCHEN_TIPS.map((t) => (
                 <li key={t.title} className="text-center">
-                  <Leaf tone="a" className="mx-auto h-8 w-auto" />
-                  <h3 className="mt-4 font-display text-xl text-[#e8f7ee]">
+                  <h3 className="font-display text-xl text-[#e8f7ee]">
                     {t.title}
                   </h3>
                   <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-white/75">

@@ -1,23 +1,17 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
-/**
- * ADMIN-ONLY ACCESS
- * This page signs in with Supabase Auth, but the real protection is Row Level
- * Security in Supabase: only your admin email may insert, update or delete
- * recipes and images. See the SQL provided alongside this file.
- */
 const BUCKET = 'recipe-images'
 const MAX_FILE_MB = 5
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 const CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Baked food']
 
-/** Turn hours and minutes into the label shown on the site, e.g. "1 hr 30 min". */
 const buildTimeLabel = (hours: number, minutes: number) => {
   const parts: string[] = []
   if (hours > 0) parts.push(`${hours} hr`)
@@ -43,14 +37,76 @@ type RecipeRow = {
   steps: string[]
   published: boolean
   created_at: string
+  video_url?: string | null
 }
 
 type Notice = { type: 'success' | 'error'; text: string } | null
+type StatusFilter = 'all' | 'published' | 'draft'
 
 const inputClass =
-  'mt-1.5 w-full rounded-xl border border-[#123222]/20 bg-white px-4 py-3 text-base text-[#123222] placeholder:text-[#123222]/40 transition focus:border-[#2f6a45] focus:outline-none focus:ring-2 focus:ring-[#2f6a45]/25'
+  'w-full rounded border border-[#bbb] bg-white px-2.5 py-2 text-sm text-[#333] placeholder:text-[#999] focus:border-[#2f6a45] focus:outline-none focus:ring-2 focus:ring-[#2f6a45]/20'
 
-const labelClass = 'text-sm font-semibold text-[#123222]'
+const primaryBtn =
+  'rounded bg-[#2f6a45] px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#123222] disabled:opacity-60'
+
+const linkBtn =
+  'rounded border border-[#2f6a45] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#2f6a45] transition hover:bg-[#eef6e8]'
+
+const editBtn =
+  'rounded border border-[#123222]/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#123222] transition hover:bg-[#eef6e8]'
+
+const deleteBtn =
+  'rounded bg-[#ba2121] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-[#a41515] disabled:opacity-60'
+
+const th =
+  'border-b border-[#ddd] bg-[#f6f6f6] px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-[#666]'
+
+function Module({
+  title,
+  as: Tag = 'h2',
+  children,
+  className = '',
+}: {
+  title: string
+  as?: 'h2' | 'h3'
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <section
+      className={`overflow-hidden rounded border border-[#d4e3cb] bg-white ${className}`}
+    >
+      <Tag className="bg-[#2f6a45] px-4 py-2 text-[13px] font-semibold uppercase tracking-wide text-white">
+        {title}
+      </Tag>
+      {children}
+    </section>
+  )
+}
+
+function FormRow({
+  label,
+  htmlFor,
+  help,
+  children,
+}: {
+  label: string
+  htmlFor?: string
+  help?: string
+  children: ReactNode
+}) {
+  return (
+    <div className="grid gap-1.5 border-b border-[#eee] px-4 py-3 last:border-b-0 sm:grid-cols-[11rem_1fr] sm:gap-4">
+      <label htmlFor={htmlFor} className="pt-2 text-sm font-bold text-[#333]">
+        {label}
+      </label>
+      <div className="min-w-0">
+        {children}
+        {help && <p className="mt-1.5 text-xs text-[#666]">{help}</p>}
+      </div>
+    </div>
+  )
+}
 
 const createSlug = (value: string) =>
   value
@@ -59,7 +115,6 @@ const createSlug = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-/** Pull the storage object path out of a public URL, if it's ours. */
 const storagePathFromUrl = (url: string) => {
   const marker = `/${BUCKET}/`
   const index = url.indexOf(marker)
@@ -76,6 +131,8 @@ export default function AdminPage() {
   const [notice, setNotice] = useState<Notice>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [categoryFilter, setCategoryFilter] = useState('all')
 
   const [session, setSession] = useState<Session | null>(null)
   const [authChecked, setAuthChecked] = useState(false)
@@ -84,12 +141,15 @@ export default function AdminPage() {
   const [signingIn, setSigningIn] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  const [editingRecipe, setEditingRecipe] = useState<RecipeRow | null>(null)
+
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
   const [category, setCategory] = useState('Dinner')
   const [timeHours, setTimeHours] = useState('0')
   const [timeMinutes, setTimeMinutes] = useState('30')
   const [description, setDescription] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
   const [ingredients, setIngredients] = useState('')
   const [steps, setSteps] = useState('')
   const [published, setPublished] = useState(true)
@@ -108,7 +168,10 @@ export default function AdminPage() {
       .order('created_at', { ascending: false })
 
     if (error) {
-      setNotice({ type: 'error', text: `Could not load recipes: ${error.message}` })
+      setNotice({
+        type: 'error',
+        text: `Could not load recipes: ${error.message}`,
+      })
     } else {
       setRecipes((data ?? []) as RecipeRow[])
     }
@@ -122,9 +185,11 @@ export default function AdminPage() {
       setAuthChecked(true)
     })
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next)
-    })
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, next) => {
+        setSession(next)
+      },
+    )
 
     return () => listener.subscription.unsubscribe()
   }, [])
@@ -139,10 +204,16 @@ export default function AdminPage() {
     setSigningIn(true)
     setNotice(null)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
     if (error) {
-      setNotice({ type: 'error', text: 'Sign in failed. Check your email and password.' })
+      setNotice({
+        type: 'error',
+        text: 'Sign in failed. Check your email and password.',
+      })
     } else {
       setPassword('')
       setShowPassword(false)
@@ -156,25 +227,50 @@ export default function AdminPage() {
     setNotice(null)
   }
 
-  // Free the temporary preview URL when it changes or the page unmounts.
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl)
     }
   }, [previewUrl])
 
+  const filterCategories = useMemo(
+    () =>
+      Array.from(
+        new Set([...CATEGORIES, ...recipes.map((recipe) => recipe.category)]),
+      ),
+    [recipes],
+  )
+
   const filteredRecipes = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return recipes
-    return recipes.filter(
-      (r) =>
-        r.title.toLowerCase().includes(q) ||
-        r.category.toLowerCase().includes(q) ||
-        r.slug.toLowerCase().includes(q),
-    )
-  }, [recipes, query])
 
-  const publishedCount = recipes.filter((r) => r.published).length
+    return recipes.filter((recipe) => {
+      if (statusFilter === 'published' && !recipe.published) return false
+      if (statusFilter === 'draft' && recipe.published) return false
+      if (categoryFilter !== 'all' && recipe.category !== categoryFilter)
+        return false
+      if (!q) return true
+
+      return (
+        recipe.title.toLowerCase().includes(q) ||
+        recipe.category.toLowerCase().includes(q) ||
+        recipe.slug.toLowerCase().includes(q)
+      )
+    })
+  }, [recipes, query, statusFilter, categoryFilter])
+
+  const publishedCount = recipes.filter((recipe) => recipe.published).length
+  const draftCount = recipes.length - publishedCount
+  const hasFilters =
+    query.trim() !== '' ||
+    statusFilter !== 'all' ||
+    categoryFilter !== 'all'
+
+  const clearFilters = () => {
+    setQuery('')
+    setStatusFilter('all')
+    setCategoryFilter('all')
+  }
 
   const chooseFile = (file: File | undefined | null) => {
     if (!file) return
@@ -182,7 +278,7 @@ export default function AdminPage() {
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setNotice({
         type: 'error',
-        text: 'That file type is not supported. Use a JPG, PNG, WebP or AVIF image.',
+        text: 'That file type is not supported. Use JPG, PNG, WebP or AVIF.',
       })
       return
     }
@@ -190,7 +286,7 @@ export default function AdminPage() {
     if (file.size > MAX_FILE_MB * 1024 * 1024) {
       setNotice({
         type: 'error',
-        text: `That image is larger than ${MAX_FILE_MB} MB. Choose a smaller one.`,
+        text: `That image is larger than ${MAX_FILE_MB} MB.`,
       })
       return
     }
@@ -207,14 +303,19 @@ export default function AdminPage() {
   }
 
   const uploadImage = async (file: File): Promise<string> => {
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`
+    const extension =
+      file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const path = `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}.${extension}`
 
-    const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-      cacheControl: '31536000',
-      contentType: file.type,
-      upsert: false,
-    })
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(path, file, {
+        cacheControl: '31536000',
+        contentType: file.type,
+        upsert: false,
+      })
 
     if (error) throw new Error(error.message)
 
@@ -222,7 +323,58 @@ export default function AdminPage() {
     return data.publicUrl
   }
 
-  const handleAddRecipe = async (event: React.FormEvent) => {
+  const resetForm = () => {
+    setEditingRecipe(null)
+    setTitle('')
+    setSlug('')
+    setCategory('Dinner')
+    setTimeHours('0')
+    setTimeMinutes('30')
+    setDescription('')
+    setVideoUrl('')
+    setIngredients('')
+    setSteps('')
+    setPublished(true)
+    clearFile()
+  }
+
+  const startEditing = (recipe: RecipeRow) => {
+    setEditingRecipe(recipe)
+    setNotice(null)
+
+    setTitle(recipe.title)
+    setSlug(recipe.slug)
+    setCategory(recipe.category)
+
+    const hours = /(\d+)\s*hr/i.exec(recipe.time_label || '')
+    const minutes = /(\d+)\s*min/i.exec(recipe.time_label || '')
+
+    setTimeHours(hours ? hours[1] : '0')
+    setTimeMinutes(minutes ? minutes[1] : '0')
+
+    setDescription(recipe.description || '')
+    setVideoUrl(recipe.video_url || '')
+
+    setIngredients(
+      (recipe.ingredients || [])
+        .map((ingredient) =>
+          [ingredient.amount, ingredient.unit, ingredient.name]
+            .filter(Boolean)
+            .join(' '),
+        )
+        .join('\n'),
+    )
+
+    setSteps((recipe.steps || []).join('\n'))
+    setPublished(recipe.published)
+    clearFile()
+
+    document
+      .getElementById('add-recipe')
+      ?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const handleSaveRecipe = async (event: React.FormEvent) => {
     event.preventDefault()
     setSaving(true)
     setNotice(null)
@@ -234,15 +386,21 @@ export default function AdminPage() {
         throw new Error('Add a recipe title before saving.')
       }
 
-      const hoursValue = Math.max(0, Math.floor(Number(timeHours) || 0))
-      const minutesValue = Math.max(0, Math.floor(Number(timeMinutes) || 0))
+      const hoursValue = Math.max(
+        0,
+        Math.floor(Number(timeHours) || 0),
+      )
+      const minutesValue = Math.max(
+        0,
+        Math.floor(Number(timeMinutes) || 0),
+      )
       const finalTimeLabel = buildTimeLabel(hoursValue, minutesValue)
 
       if (!finalTimeLabel) {
         throw new Error('Set a cooking time of at least 1 minute.')
       }
 
-      let uploadedUrl = ''
+      let uploadedUrl = editingRecipe?.image_url || ''
       let uploadedPath: string | null = null
 
       if (imageFile) {
@@ -261,7 +419,7 @@ export default function AdminPage() {
         .map((line) => line.trim())
         .filter(Boolean)
 
-      const { error } = await supabase.from('recipes').insert({
+      const recipeData = {
         title: title.trim(),
         slug: finalSlug,
         category,
@@ -271,40 +429,47 @@ export default function AdminPage() {
         ingredients: ingredientList,
         steps: stepList,
         published,
-      })
-
-      if (error) {
-        // Don't leave an orphaned image in storage if the recipe didn't save.
-        if (uploadedPath) {
-          await supabase.storage.from(BUCKET).remove([uploadedPath])
-        }
-
-        throw new Error(`Could not save recipe: ${error.message}`)
+        video_url: videoUrl.trim() || null,
       }
 
-      setNotice({ type: 'success', text: 'Recipe saved.' })
+      if (editingRecipe) {
+        const { error } = await supabase
+          .from('recipes')
+          .update(recipeData)
+          .eq('id', editingRecipe.id)
 
-      setTitle('')
-      setSlug('')
-      setCategory('Dinner')
-      setTimeHours('0')
-      setTimeMinutes('30')
-      setDescription('')
-      setIngredients('')
-      setSteps('')
-      setPublished(true)
-      clearFile()
+        if (error) {
+          throw new Error(`Could not update recipe: ${error.message}`)
+        }
 
+        setNotice({ type: 'success', text: 'Recipe updated.' })
+      } else {
+        const { error } = await supabase
+          .from('recipes')
+          .insert(recipeData)
+
+        if (error) {
+          if (uploadedPath) {
+            await supabase.storage.from(BUCKET).remove([uploadedPath])
+          }
+
+          throw new Error(`Could not save recipe: ${error.message}`)
+        }
+
+        setNotice({ type: 'success', text: 'Recipe saved.' })
+      }
+
+      resetForm()
       await loadRecipes()
       router.refresh()
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error(error)
 
       setNotice({
         type: 'error',
         text:
-          err instanceof Error
-            ? err.message
+          error instanceof Error
+            ? error.message
             : 'Something went wrong while saving the recipe.',
       })
     } finally {
@@ -322,14 +487,22 @@ export default function AdminPage() {
     setDeletingId(recipe.id)
     setNotice(null)
 
-    const { error } = await supabase.from('recipes').delete().eq('id', recipe.id)
+    const { error } = await supabase
+      .from('recipes')
+      .delete()
+      .eq('id', recipe.id)
 
     if (error) {
-      setNotice({ type: 'error', text: `Could not delete recipe: ${error.message}` })
+      setNotice({
+        type: 'error',
+        text: `Could not delete recipe: ${error.message}`,
+      })
     } else {
-      // Also remove the uploaded image so storage doesn't fill with unused files.
       const path = storagePathFromUrl(recipe.image_url || '')
-      if (path) await supabase.storage.from(BUCKET).remove([path])
+
+      if (path) {
+        await supabase.storage.from(BUCKET).remove([path])
+      }
 
       setNotice({ type: 'success', text: 'Recipe deleted.' })
       await loadRecipes()
@@ -339,21 +512,18 @@ export default function AdminPage() {
     setDeletingId(null)
   }
 
-  const StatusBadge = ({ isPublished }: { isPublished: boolean }) => (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-        isPublished ? 'bg-[#eaf3df] text-[#2f6a45]' : 'bg-[#f4e7e7] text-[#a33]'
-      }`}
-    >
-      <span
-        aria-hidden
-        className={`h-1.5 w-1.5 rounded-full ${
-          isPublished ? 'bg-[#2f6a45]' : 'bg-[#a33]'
-        }`}
-      />
-      {isPublished ? 'Published' : 'Draft'}
-    </span>
-  )
+  const StatusBadge = ({ isPublished }: { isPublished: boolean }) =>
+    isPublished ? (
+      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2f6a45]">
+        <span aria-hidden className="text-base leading-none">✔</span>
+        Published
+      </span>
+    ) : (
+      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#ba2121]">
+        <span aria-hidden className="text-base leading-none">✖</span>
+        Draft
+      </span>
+    )
 
   const Thumb = ({ recipe }: { recipe: RecipeRow }) =>
     recipe.image_url ? (
@@ -361,326 +531,353 @@ export default function AdminPage() {
       <img
         src={recipe.image_url}
         alt=""
-        className="h-14 w-14 shrink-0 rounded-xl object-cover"
+        className="h-11 w-11 shrink-0 rounded object-cover ring-1 ring-[#ddd]"
       />
     ) : (
-      <div
-        aria-hidden
-        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#eaf3df] text-xs font-semibold text-[#2f6a45]"
-      >
-        No photo
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-[#eef6e8] text-[10px] font-semibold text-[#2f6a45] ring-1 ring-[#d4e3cb]">
+        None
       </div>
     )
 
   const RowActions = ({ recipe }: { recipe: RecipeRow }) => (
     <div className="flex gap-2">
-      <Link
-        href={`/recipe/${recipe.slug}`}
-        className="rounded-full border border-[#2f6a45]/40 px-4 py-2 text-xs font-semibold text-[#2f6a45] transition hover:bg-[#eaf3df] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f6a45]"
-      >
+      <Link href={`/recipe/${recipe.slug}`} className={linkBtn}>
         View
       </Link>
+
+      <button
+        type="button"
+        onClick={() => startEditing(recipe)}
+        className={editBtn}
+      >
+        Edit
+      </button>
+
       <button
         type="button"
         onClick={() => handleDelete(recipe)}
         disabled={deletingId === recipe.id}
-        className="rounded-full bg-[#c0392b] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#96281b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c0392b] disabled:opacity-60"
+        className={deleteBtn}
       >
         {deletingId === recipe.id ? 'Deleting…' : 'Delete'}
       </button>
     </div>
   )
 
+  const noticeBar = notice && (
+    <div
+      role={notice.type === 'error' ? 'alert' : 'status'}
+      className={`mb-5 flex items-start justify-between gap-4 border-l-4 px-4 py-3 text-sm font-semibold ${
+        notice.type === 'success'
+          ? 'border-[#2f6a45] bg-[#e1f3d8] text-[#1f4d31]'
+          : 'border-[#ba2121] bg-[#ffefef] text-[#ba2121]'
+      }`}
+    >
+      <span>{notice.text}</span>
+      <button
+        type="button"
+        onClick={() => setNotice(null)}
+        className="shrink-0 text-lg leading-none opacity-60 hover:opacity-100"
+      >
+        ×
+      </button>
+    </div>
+  )
+
+  const filterItem = (active: boolean) =>
+    `block w-full px-4 py-1.5 text-left text-sm transition-colors ${
+      active
+        ? 'border-l-4 border-[#2f6a45] bg-[#eef6e8] pl-3 font-semibold text-[#2f6a45]'
+        : 'text-[#2f6a45]/80 hover:bg-[#f5f9f1] hover:text-[#2f6a45]'
+    }`
+
   if (!authChecked) {
     return (
-      <main className="mx-auto max-w-md px-4 py-24 text-center text-[#123222]/70">
-        Checking your session…
-      </main>
+      <div className="min-h-screen bg-white">
+        <header className="bg-[#123222] px-5 py-3 text-[#f6f1c4]">
+          <p className="text-xl font-light">EatsByTeks administration</p>
+        </header>
+        <p className="px-4 py-24 text-center text-[#666]">
+          Checking your session…
+        </p>
+      </div>
     )
   }
 
   if (!session) {
     return (
-      <main className="mx-auto max-w-md px-4 py-16 sm:py-24">
-        <h1 className="text-3xl font-bold tracking-tight text-[#123222]">
-          Admin sign in
-        </h1>
-        <p className="mt-2 text-[#123222]/70">
-          This area is for site admins only.
-        </p>
+      <div className="min-h-screen bg-[#f8f8f8]">
+        <header className="bg-[#123222] px-5 py-3 text-[#f6f1c4]">
+          <p className="text-xl font-light">EatsByTeks administration</p>
+        </header>
 
-        {notice && (
-          <div
-            role="alert"
-            className="mt-6 rounded-xl border border-[#c0392b]/30 bg-[#f9e9e6] p-4 text-sm font-semibold text-[#96281b]"
-          >
-            {notice.text}
-          </div>
-        )}
+        <main className="mx-auto mt-12 w-full max-w-sm px-4 pb-16">
+          {noticeBar}
 
-        <form
-          onSubmit={handleSignIn}
-          className="mt-6 grid gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-[#123222]/10 sm:p-6"
-        >
-          <label className="block">
-            <span className={labelClass}>Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              required
-              className={inputClass}
-            />
-          </label>
+          <div className="overflow-hidden rounded border border-[#ccc] bg-white">
+            <h1 className="bg-[#2f6a45] px-4 py-2 text-[13px] font-semibold uppercase tracking-wide text-white">
+              Admin sign in
+            </h1>
 
-          <label className="block">
-            <span className={labelClass}>Password</span>
-            <div className="relative mt-1.5">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                autoComplete="current-password"
-                required
-                className={`${inputClass.replace('mt-1.5', '')} pr-20`}
-              />
+            <form onSubmit={handleSignIn} className="grid gap-4 p-5">
+              <div>
+                <label htmlFor="login-email" className="text-sm font-bold text-[#333]">
+                  Email:
+                </label>
+                <input
+                  id="login-email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                  className={`mt-1.5 ${inputClass}`}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="login-password" className="text-sm font-bold text-[#333]">
+                  Password:
+                </label>
+                <div className="relative mt-1.5">
+                  <input
+                    id="login-password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                    className={`${inputClass} pr-16`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded px-2.5 py-1 text-xs font-semibold text-[#2f6a45]"
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+
               <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                aria-pressed={showPassword}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-3 py-1.5 text-xs font-semibold text-[#2f6a45] transition hover:bg-[#eaf3df] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f6a45]"
+                type="submit"
+                disabled={signingIn}
+                className={`${primaryBtn} w-full`}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {signingIn ? 'Signing in…' : 'Log in'}
               </button>
-            </div>
-          </label>
-
-          <button
-            type="submit"
-            disabled={signingIn}
-            className="w-full rounded-full bg-[#2f6a45] px-8 py-3.5 font-semibold text-white transition hover:bg-[#123222] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f6a45] disabled:opacity-60"
-          >
-            {signingIn ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
-      </main>
+            </form>
+          </div>
+        </main>
+      </div>
     )
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#123222] sm:text-4xl">
-            Recipe admin
-          </h1>
-          <p className="mt-2 max-w-xl text-[#123222]/70">
-            Add recipes with a photo, check what’s live, and remove anything you
-            no longer want on the site.
-          </p>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="mt-3 rounded-full border border-[#123222]/25 px-4 py-2 text-xs font-semibold text-[#123222] transition hover:bg-[#eaf3df]"
-          >
-            Sign out
-          </button>
-        </div>
+    <div className="min-h-screen bg-white text-[#333]">
+      <header className="bg-[#123222] text-[#f6f1c4]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <p className="text-xl font-light">EatsByTeks administration</p>
 
-        <dl className="flex gap-3">
-          <div className="min-w-[96px] flex-1 rounded-2xl bg-[#123222] px-5 py-3 text-white sm:flex-none">
-            <dt className="text-xs text-white/70">Total</dt>
-            <dd className="text-2xl font-bold">{recipes.length}</dd>
-          </div>
-          <div className="min-w-[96px] flex-1 rounded-2xl bg-[#eaf3df] px-5 py-3 text-[#123222] sm:flex-none">
-            <dt className="text-xs text-[#123222]/70">Published</dt>
-            <dd className="text-2xl font-bold">{publishedCount}</dd>
-          </div>
-        </dl>
+          <p className="text-[11px] uppercase tracking-wide text-[#f6f1c4]/80">
+            Welcome,{' '}
+            <strong className="font-bold text-[#f6f1c4]">
+              {session.user.email}
+            </strong>
+            .{' '}
+            <Link href="/" className="font-semibold text-white hover:underline">
+              View site
+            </Link>
+            {' / '}
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="font-semibold uppercase tracking-wide text-white hover:underline"
+            >
+              Log out
+            </button>
+          </p>
+        </div>
       </header>
 
-      {notice && (
-        <div
-          role="status"
-          aria-live="polite"
-          className={`mt-6 flex items-start justify-between gap-4 rounded-xl border p-4 text-sm font-semibold ${
-            notice.type === 'success'
-              ? 'border-[#2f6a45]/30 bg-[#eaf3df] text-[#1f4d31]'
-              : 'border-[#c0392b]/30 bg-[#f9e9e6] text-[#96281b]'
-          }`}
-        >
-          <span>{notice.text}</span>
-          <button
-            type="button"
-            onClick={() => setNotice(null)}
-            aria-label="Dismiss message"
-            className="shrink-0 text-lg leading-none opacity-60 hover:opacity-100"
+      <main className="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8">
+        {noticeBar}
+
+        <h1 className="mb-6 text-2xl font-light text-[#3a5444]">
+          Recipe administration
+        </h1>
+
+        <div className="mb-3 flex justify-end">
+          <a
+            href="#add-recipe"
+            className="rounded-full bg-[#2f6a45] px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white"
           >
-            ×
-          </button>
-        </div>
-      )}
-
-      {/* ───────── All recipes ───────── */}
-      <section className="mt-8 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-[#123222]/10 sm:mt-10 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-bold text-[#123222] sm:text-2xl">
-            All recipes
-          </h2>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by title, category or slug"
-            aria-label="Search recipes"
-            className="w-full rounded-full border border-[#123222]/20 px-5 py-2.5 text-sm text-[#123222] placeholder:text-[#123222]/40 focus:border-[#2f6a45] focus:outline-none focus:ring-2 focus:ring-[#2f6a45]/25 sm:max-w-xs"
-          />
+            Add recipe +
+          </a>
         </div>
 
-        {loading ? (
-          <p className="mt-6 text-[#123222]/70">Loading recipes…</p>
-        ) : recipes.length === 0 ? (
-          <p className="mt-6 text-[#123222]/70">
-            No recipes yet. Use the form below to add your first one.
-          </p>
-        ) : filteredRecipes.length === 0 ? (
-          <p className="mt-6 text-[#123222]/70">
-            No recipes match “{query}”. Try a different word.
-          </p>
-        ) : (
-          <>
-            {/* Mobile: stacked cards */}
-            <ul className="mt-5 grid gap-3 md:hidden">
-              {filteredRecipes.map((recipe) => (
-                <li
-                  key={recipe.id}
-                  className="rounded-2xl border border-[#123222]/10 p-4"
+        <div className="gap-6 lg:flex lg:items-start">
+          <Module title="Select recipe to change" className="min-w-0 flex-1">
+            <div className="flex flex-col gap-3 border-b border-[#ddd] bg-[#f8f8f8] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by title, category or slug"
+                className={`${inputClass} sm:max-w-sm`}
+              />
+
+              {hasFilters && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="text-xs font-semibold uppercase tracking-wide text-[#2f6a45] hover:underline"
                 >
-                  <div className="flex items-start gap-3">
-                    <Thumb recipe={recipe} />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold text-[#123222]">
-                        {recipe.title}
-                      </p>
-                      <p className="mt-0.5 text-sm text-[#123222]/70">
-                        {recipe.category}
-                        {recipe.time_label ? ` • ${recipe.time_label}` : ''}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-[#123222]/50">
-                        /{recipe.slug}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <StatusBadge isPublished={recipe.published} />
-                    <RowActions recipe={recipe} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            {/* Tablet and up: table */}
-            <div className="mt-5 hidden overflow-x-auto md:block">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[#123222]/15 text-[#123222]/70">
-                    <th scope="col" className="py-3 pr-4 font-semibold">
-                      Recipe
-                    </th>
-                    <th scope="col" className="py-3 pr-4 font-semibold">
-                      Category
-                    </th>
-                    <th scope="col" className="py-3 pr-4 font-semibold">
-                      Slug
-                    </th>
-                    <th scope="col" className="py-3 pr-4 font-semibold">
-                      Status
-                    </th>
-                    <th scope="col" className="py-3 text-right font-semibold">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredRecipes.map((recipe) => (
-                    <tr
-                      key={recipe.id}
-                      className="border-b border-[#123222]/10 last:border-0"
-                    >
-                      <td className="py-3 pr-4">
-                        <div className="flex items-center gap-3">
-                          <Thumb recipe={recipe} />
-                          <span className="font-semibold text-[#123222]">
-                            {recipe.title}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-3 pr-4 text-[#123222]/70">
-                        {recipe.category}
-                      </td>
-                      <td className="py-3 pr-4 text-[#123222]/70">
-                        {recipe.slug}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <StatusBadge isPublished={recipe.published} />
-                      </td>
-                      <td className="py-3">
-                        <div className="flex justify-end">
-                          <RowActions recipe={recipe} />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  Clear all filters
+                </button>
+              )}
             </div>
-          </>
-        )}
-      </section>
 
-      {/* ───────── Add new recipe ───────── */}
-      <section className="mt-8 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-[#123222]/10 sm:mt-10 sm:p-6">
-        <h2 className="text-xl font-bold text-[#123222] sm:text-2xl">
-          Add new recipe
-        </h2>
+            {loading ? (
+              <p className="px-4 py-6 text-sm text-[#666]">Loading recipes…</p>
+            ) : filteredRecipes.length === 0 ? (
+              <p className="px-4 py-6 text-sm text-[#666]">
+                No recipes match your search or filters.
+              </p>
+            ) : (
+              <div className="hidden overflow-x-auto md:block">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr>
+                      <th className={th}>Recipe</th>
+                      <th className={th}>Category</th>
+                      <th className={th}>Time</th>
+                      <th className={th}>Slug</th>
+                      <th className={th}>Status</th>
+                      <th className={`${th} text-right`}>Actions</th>
+                    </tr>
+                  </thead>
 
-        <form onSubmit={handleAddRecipe} className="mt-6 grid gap-8">
-          {/* Basics */}
-          <fieldset className="grid gap-4">
-            <legend className="mb-1 text-base font-bold text-[#123222]">
-              Basics
-            </legend>
+                  <tbody>
+                    {filteredRecipes.map((recipe) => (
+                      <tr
+                        key={recipe.id}
+                        className="border-b border-[#eee] even:bg-[#f9fbf7] hover:bg-[#eef6e8]"
+                      >
+                        <td className="px-3 py-2.5">
+                          <div className="flex items-center gap-3">
+                            <Thumb recipe={recipe} />
+                            <span className="font-semibold text-[#2f6a45]">
+                              {recipe.title}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2.5 text-[#555]">
+                          {recipe.category}
+                        </td>
+                        <td className="px-3 py-2.5 text-[#555]">
+                          {recipe.time_label || '—'}
+                        </td>
+                        <td className="px-3 py-2.5 text-[#777]">
+                          {recipe.slug}
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <StatusBadge isPublished={recipe.published} />
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <div className="flex justify-end">
+                            <RowActions recipe={recipe} />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Module>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block">
-                <span className={labelClass}>Title</span>
+          <aside className="mt-6 w-full space-y-6 lg:mt-0 lg:w-64 lg:shrink-0">
+            <Module title="Filter">
+              <div className="py-3">
+                <h3 className="px-4 pb-1.5 text-sm text-[#666]">By status</h3>
+                <ul>
+                  {(
+                    [
+                      ['all', 'All'],
+                      ['published', 'Published'],
+                      ['draft', 'Draft'],
+                    ] as [StatusFilter, string][]
+                  ).map(([value, label]) => (
+                    <li key={value}>
+                      <button
+                        type="button"
+                        onClick={() => setStatusFilter(value)}
+                        className={filterItem(statusFilter === value)}
+                      >
+                        {label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Module>
+
+            <Module title="Summary">
+              <dl className="text-sm">
+                <div className="flex items-center justify-between border-b border-[#eee] px-4 py-2.5">
+                  <dt className="text-[#666]">Total recipes</dt>
+                  <dd className="font-bold text-[#123222]">{recipes.length}</dd>
+                </div>
+                <div className="flex items-center justify-between border-b border-[#eee] px-4 py-2.5">
+                  <dt className="text-[#666]">Published</dt>
+                  <dd className="font-bold text-[#2f6a45]">{publishedCount}</dd>
+                </div>
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <dt className="text-[#666]">Drafts</dt>
+                  <dd className="font-bold text-[#ba2121]">{draftCount}</dd>
+                </div>
+              </dl>
+            </Module>
+          </aside>
+        </div>
+
+        <div id="add-recipe" className="mt-12 scroll-mt-6">
+          <h2 className="mb-6 text-2xl font-light text-[#3a5444]">
+            {editingRecipe
+              ? `Edit recipe: ${editingRecipe.title}`
+              : 'Add recipe'}
+          </h2>
+
+          <form onSubmit={handleSaveRecipe} className="space-y-6">
+            <Module title="Basics" as="h3">
+              <FormRow label="Title:" htmlFor="f-title">
                 <input
+                  id="f-title"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                   required
-                  className={inputClass}
+                  className={`${inputClass} max-w-xl`}
                 />
-              </label>
+              </FormRow>
 
-              <label className="block">
-                <span className={labelClass}>URL slug (optional)</span>
+              <FormRow
+                label="URL slug:"
+                htmlFor="f-slug"
+                help="Created from the title if left empty."
+              >
                 <input
+                  id="f-slug"
                   value={slug}
                   onChange={(event) => setSlug(event.target.value)}
-                  placeholder="Created from the title"
-                  className={inputClass}
+                  className={`${inputClass} max-w-xl`}
                 />
-              </label>
+              </FormRow>
 
-              <label className="block">
-                <span className={labelClass}>Category</span>
+              <FormRow label="Category:" htmlFor="f-category">
                 <select
+                  id="f-category"
                   value={category}
                   onChange={(event) => setCategory(event.target.value)}
-                  className={inputClass}
+                  className={`${inputClass} max-w-xs`}
                 >
                   {CATEGORIES.map((option) => (
                     <option key={option} value={option}>
@@ -688,184 +885,177 @@ export default function AdminPage() {
                     </option>
                   ))}
                 </select>
-              </label>
+              </FormRow>
 
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block">
-                  <span className={labelClass}>Hours</span>
+              <FormRow label="Cooking time:" htmlFor="f-hours">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-[#555]">
                   <input
+                    id="f-hours"
                     type="number"
-                    inputMode="numeric"
                     min={0}
-                    max={48}
                     value={timeHours}
                     onChange={(event) => setTimeHours(event.target.value)}
-                    className={inputClass}
+                    className={`${inputClass} w-20`}
                   />
-                </label>
-
-                <label className="block">
-                  <span className={labelClass}>Minutes</span>
+                  <span>hours</span>
                   <input
                     type="number"
-                    inputMode="numeric"
                     min={0}
-                    max={59}
                     value={timeMinutes}
                     onChange={(event) => setTimeMinutes(event.target.value)}
-                    className={inputClass}
+                    className={`${inputClass} ml-2 w-20`}
                   />
-                </label>
-              </div>
-            </div>
-
-            <label className="block">
-              <span className={labelClass}>Description</span>
-              <textarea
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                rows={3}
-                className={inputClass}
-              />
-            </label>
-          </fieldset>
-
-          {/* Photo */}
-          <fieldset>
-            <legend className="mb-3 text-base font-bold text-[#123222]">
-              Photo
-            </legend>
-
-            <input
-              ref={fileInputRef}
-              id="recipe-image"
-              type="file"
-              accept={ACCEPTED_TYPES.join(',')}
-              onChange={(event) => chooseFile(event.target.files?.[0])}
-              className="sr-only"
-            />
-
-            {previewUrl ? (
-              <div className="flex flex-col gap-4 rounded-2xl border border-[#123222]/15 p-3 sm:flex-row sm:items-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={previewUrl}
-                  alt="Selected recipe photo preview"
-                  className="aspect-[4/3] w-full rounded-xl object-cover sm:h-32 sm:w-44"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-[#123222]">
-                    {imageFile?.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-[#123222]/60">
-                    {imageFile ? (imageFile.size / 1024 / 1024).toFixed(2) : 0} MB •
-                    uploads when you save
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="rounded-full border border-[#2f6a45]/40 px-4 py-2 text-xs font-semibold text-[#2f6a45] hover:bg-[#eaf3df]"
-                    >
-                      Replace
-                    </button>
-                    <button
-                      type="button"
-                      onClick={clearFile}
-                      className="rounded-full border border-[#c0392b]/40 px-4 py-2 text-xs font-semibold text-[#c0392b] hover:bg-[#f9e9e6]"
-                    >
-                      Remove
-                    </button>
-                  </div>
+                  <span>minutes</span>
                 </div>
-              </div>
-            ) : (
-              <label
-                htmlFor="recipe-image"
-                onDragOver={(event) => {
-                  event.preventDefault()
-                  setDragging(true)
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={(event) => {
-                  event.preventDefault()
-                  setDragging(false)
-                  chooseFile(event.dataTransfer.files?.[0])
-                }}
-                className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed px-4 py-10 text-center transition focus-within:ring-2 focus-within:ring-[#2f6a45]/40 ${
-                  dragging
-                    ? 'border-[#2f6a45] bg-[#eaf3df]'
-                    : 'border-[#123222]/25 hover:border-[#2f6a45] hover:bg-[#f6faf1]'
-                }`}
+              </FormRow>
+
+              <FormRow label="Description:" htmlFor="f-description">
+                <textarea
+                  id="f-description"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  rows={3}
+                  className={`${inputClass} max-w-3xl`}
+                />
+              </FormRow>
+
+              <FormRow
+                label="Video URL:"
+                htmlFor="f-video"
+                help="Optional. Add a YouTube, TikTok or other video link."
               >
-                <span className="text-base font-semibold text-[#123222]">
-                  Choose a photo
-                </span>
-                <span className="text-sm text-[#123222]/60">
-                  Tap to browse, or drag an image here
-                </span>
-                <span className="mt-1 text-xs text-[#123222]/50">
-                  JPG, PNG, WebP or AVIF, up to {MAX_FILE_MB} MB
+                <input
+                  id="f-video"
+                  value={videoUrl}
+                  onChange={(event) => setVideoUrl(event.target.value)}
+                  placeholder="https://youtube.com/watch?v=..."
+                  className={`${inputClass} max-w-3xl`}
+                />
+              </FormRow>
+            </Module>
+
+            <Module title="Photo" as="h3">
+              <FormRow
+                label="Recipe photo:"
+                htmlFor="recipe-image"
+                help={`JPG, PNG, WebP or AVIF, up to ${MAX_FILE_MB} MB.`}
+              >
+                <input
+                  ref={fileInputRef}
+                  id="recipe-image"
+                  type="file"
+                  accept={ACCEPTED_TYPES.join(',')}
+                  onChange={(event) =>
+                    chooseFile(event.target.files?.[0])
+                  }
+                  className="sr-only"
+                />
+
+                {previewUrl ? (
+                  <div className="flex max-w-xl flex-col gap-4 rounded border border-[#ddd] p-3 sm:flex-row sm:items-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={previewUrl}
+                      alt="Selected recipe photo"
+                      className="aspect-[4/3] w-full rounded object-cover sm:h-28 sm:w-40"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className={linkBtn}
+                      >
+                        Replace
+                      </button>
+                      <button
+                        type="button"
+                        onClick={clearFile}
+                        className={deleteBtn}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="recipe-image"
+                    className="flex max-w-xl cursor-pointer flex-col items-center justify-center gap-1 rounded border-2 border-dashed px-4 py-8 text-center"
+                  >
+                    <span className="text-sm font-semibold text-[#2f6a45]">
+                      Choose a photo
+                    </span>
+                    <span className="text-xs text-[#666]">
+                      Tap to browse, or drag an image here
+                    </span>
+                  </label>
+                )}
+              </FormRow>
+            </Module>
+
+            <Module title="Method" as="h3">
+              <FormRow label="Ingredients:" htmlFor="f-ingredients">
+                <textarea
+                  id="f-ingredients"
+                  value={ingredients}
+                  onChange={(event) => setIngredients(event.target.value)}
+                  rows={8}
+                  className={`${inputClass} max-w-3xl`}
+                />
+              </FormRow>
+
+              <FormRow label="Steps:" htmlFor="f-steps">
+                <textarea
+                  id="f-steps"
+                  value={steps}
+                  onChange={(event) => setSteps(event.target.value)}
+                  rows={8}
+                  className={`${inputClass} max-w-3xl`}
+                />
+              </FormRow>
+            </Module>
+
+            <div className="flex flex-col gap-4 rounded border border-[#ddd] bg-[#f8f8f8] p-4 sm:flex-row sm:items-center sm:justify-between">
+              <label className="flex cursor-pointer items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={published}
+                  onChange={(event) =>
+                    setPublished(event.target.checked)
+                  }
+                  className="h-4 w-4 accent-[#2f6a45]"
+                />
+                <span className="text-sm font-bold text-[#333]">
+                  Publish immediately
                 </span>
               </label>
-            )}
-          </fieldset>
 
-          {/* Method */}
-          <fieldset className="grid gap-4 lg:grid-cols-2">
-            <legend className="mb-1 text-base font-bold text-[#123222] lg:col-span-2">
-              Method
-            </legend>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {editingRecipe && (
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="rounded border border-[#123222]/30 px-6 py-2.5 text-sm font-semibold uppercase tracking-wide text-[#123222] hover:bg-[#eef6e8]"
+                  >
+                    Cancel edit
+                  </button>
+                )}
 
-            <label className="block">
-              <span className={labelClass}>Ingredients (one per line)</span>
-              <textarea
-                value={ingredients}
-                onChange={(event) => setIngredients(event.target.value)}
-                rows={8}
-                placeholder={'250 g flour\n2 eggs\n1 cup milk'}
-                className={inputClass}
-              />
-            </label>
-
-            <label className="block">
-              <span className={labelClass}>Steps (one per line)</span>
-              <textarea
-                value={steps}
-                onChange={(event) => setSteps(event.target.value)}
-                rows={8}
-                placeholder={'Mix the dry ingredients.\nAdd the wet ingredients.'}
-                className={inputClass}
-              />
-            </label>
-          </fieldset>
-
-          {/* Publish + save */}
-          <div className="flex flex-col gap-4 border-t border-[#123222]/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                checked={published}
-                onChange={(event) => setPublished(event.target.checked)}
-                className="h-5 w-5 accent-[#2f6a45]"
-              />
-              <span className={labelClass}>Publish immediately</span>
-            </label>
-
-            <button
-              type="submit"
-              disabled={saving}
-              className="w-full rounded-full bg-[#2f6a45] px-8 py-3.5 font-semibold text-white transition hover:bg-[#123222] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2f6a45] disabled:opacity-60 sm:w-auto"
-            >
-              {saving
-                ? imageFile
-                  ? 'Uploading and saving…'
-                  : 'Saving…'
-                : 'Save recipe'}
-            </button>
-          </div>
-        </form>
-      </section>
-    </main>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className={`${primaryBtn} w-full sm:w-auto`}
+                >
+                  {saving
+                    ? 'Saving…'
+                    : editingRecipe
+                      ? 'Update recipe'
+                      : 'Save recipe'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
   )
 }

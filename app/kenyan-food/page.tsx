@@ -85,6 +85,7 @@ const PILLARS = [
   { label: 'Made to share' },
 ]
 
+/* Still used by the page body (not the footer). */
 function Leaf({ tone = 'a', className = '' }: { tone?: 'a' | 'b'; className?: string }) {
   const fill = tone === 'a' ? '#8fb88a' : '#6f8d54'
   return (
@@ -102,19 +103,7 @@ function Leaf({ tone = 'a', className = '' }: { tone?: 'a' | 'b'; className?: st
   )
 }
 
-function Lemon({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 90" className={className} aria-hidden="true">
-      <path
-        d="M6 45 C6 45 20 40 30 24 C46 4 86 6 100 30 C104 36 108 42 114 45 C108 48 104 54 100 60 C86 84 46 86 30 66 C20 50 6 45 6 45 Z"
-        fill="#f7d44a"
-      />
-      <path d="M30 30 C48 14 80 16 94 34" stroke="#fff" strokeOpacity=".45" strokeWidth="4" fill="none" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-/* ---- Footer below is exactly as provided ---- */
+/* ---- Footer below is exactly as provided, minus the leaves and lemon ---- */
 
 function SiteFooter() {
   const year = 2026
@@ -154,35 +143,6 @@ function SiteFooter() {
           aria-hidden="true"
           className="pointer-events-none absolute -right-24 bottom-0 size-[26rem] rounded-full bg-[#f7b32b]/10 blur-3xl"
         />
-
-        {/* botanicals that drift as the page scrolls */}
-        <div
-          data-speed="0.25"
-          data-x="-0.12"
-          data-rot="-30"
-          data-spin="0.03"
-          className="pointer-events-none absolute -right-6 top-6 w-24 opacity-90 will-change-transform lg:right-10 lg:w-40"
-        >
-          <Leaf tone="a" className="h-auto w-full drop-shadow-lg" />
-        </div>
-        <div
-          data-speed="-0.2"
-          data-x="0.12"
-          data-rot="14"
-          data-spin="0.06"
-          className="pointer-events-none absolute left-[6%] top-[38%] hidden w-14 will-change-transform lg:block"
-        >
-          <Lemon className="h-auto w-full drop-shadow-lg" />
-        </div>
-        <div
-          data-speed="0.18"
-          data-x="0.1"
-          data-rot="52"
-          data-spin="-0.03"
-          className="pointer-events-none absolute bottom-24 right-[30%] hidden w-16 opacity-70 will-change-transform lg:block"
-        >
-          <Leaf tone="b" className="h-auto w-full" />
-        </div>
 
         <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-6 sm:pt-10 lg:px-8">
           {/* Call to action */}
@@ -269,10 +229,7 @@ function SiteFooter() {
               <h3 className="font-display text-lg text-[#fbf6c8]">How we cook</h3>
               <ul className="mt-4 space-y-3 text-sm text-[#f4efd8]/80">
                 {PILLARS.map((p) => (
-                  <li key={p.label} className="flex items-center gap-3">
-                    <Leaf tone="a" className="h-5 w-auto shrink-0" />
-                    {p.label}
-                  </li>
+                  <li key={p.label}>{p.label}</li>
                 ))}
               </ul>
             </div>

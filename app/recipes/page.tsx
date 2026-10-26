@@ -10,6 +10,7 @@ import {
   Bookmark,
   Clock3,
   Heart,
+  Mail,
   Search,
   ShoppingBasket,
   Users,
@@ -26,8 +27,6 @@ import {
 import type { Recipe } from '@/lib/recipes'
 import { supabase } from '@/lib/supabase'
 import { useRecipeShelf } from '@/lib/useRecipeShelf'
-
-
 
 type DbRecipe = {
   id: number
@@ -86,6 +85,7 @@ function mapSupabaseRecipe(row: DbRecipe): Recipe {
     method: (row.steps ?? []).join('\n'),
   }
 }
+
 function Reveal({
   children,
   delay = 0,
@@ -134,6 +134,16 @@ function Reveal({
 const GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/></svg>\")"
 
+/* Copy the real values for these from your homepage. */
+const CONTACT_EMAIL = 'hello@eatsbyteks.com'
+const SUBSTACK_URL = 'https://substack.com/@eatsbyteks'
+
+/* Order matters: [0] = Privacy Policy, [1] = Terms of Service. */
+const FOOTER_LEGAL = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Service', href: '/terms' },
+]
+
 const FOOTER_SOCIALS = [
   { label: 'Instagram', href: '#' },
   { label: 'TikTok', href: '#' },
@@ -164,73 +174,24 @@ const PILLARS = [
   { label: 'Made to share' },
 ]
 
-function Leaf({
-  tone = 'a',
-  className = '',
-}: {
-  tone?: 'a' | 'b'
-  className?: string
-}) {
-  const fill = tone === 'a' ? '#8fb88a' : '#6f8d54'
-
-  return (
-    <svg viewBox="0 0 100 140" className={className} aria-hidden="true">
-      <path
-        d="M50 4 C92 40 96 100 50 136 C4 100 8 40 50 4 Z"
-        fill={fill}
-      />
-      <path
-        d="M50 14 L50 130"
-        stroke="#1b2e13"
-        strokeOpacity=".35"
-        strokeWidth="3"
-        fill="none"
-      />
-      <path
-        d="M50 50 L28 38 M50 70 L24 58 M50 90 L28 80 M50 50 L72 38 M50 70 L76 58 M50 90 L72 80"
-        stroke="#1b2e13"
-        strokeOpacity=".25"
-        strokeWidth="2.5"
-        fill="none"
-      />
-    </svg>
-  )
-}
-
-function Lemon({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 90" className={className} aria-hidden="true">
-      <path
-        d="M6 45 C6 45 20 40 30 24 C46 4 86 6 100 30 C104 36 108 42 114 45 C108 48 104 54 100 60 C86 84 46 86 30 66 C20 50 6 45 6 45 Z"
-        fill="#f7d44a"
-      />
-      <path
-        d="M30 30 C48 14 80 16 94 34"
-        stroke="#fff"
-        strokeOpacity=".45"
-        strokeWidth="4"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
-const drift = (
-  speed: number,
-  rotate: number,
-  spin: number,
-): CSSProperties => ({
-  transform: `translate3d(0, calc((var(--p) - 1) * ${speed}px), 0) rotate(calc(${rotate}deg + var(--p) * ${spin}deg))`,
-})
-
 function RecipesFooter() {
   const year = 2026
+  const [email, setEmail] = useState('')
+  const [agreed, setAgreed] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'done'>('idle')
+
+  const subscribe = (event: FormEvent) => {
+    event.preventDefault()
+    if (!email || !agreed) return
+
+    window.open(SUBSTACK_URL, '_blank', 'noopener,noreferrer')
+    setStatus('done')
+  }
 
   return (
     <footer
       className="relative"
-      style={{ backgroundColor: '#eaf3df' }}
+      style={{ backgroundColor: '#f3f8f4' }}
       aria-label="Site footer"
     >
       <svg
@@ -241,16 +202,16 @@ function RecipesFooter() {
       >
         <path
           d="M0,52 C180,112 360,2 560,48 C760,94 920,12 1100,52 C1260,86 1360,36 1440,56 L1440,120 L0,120 Z"
-          fill="#6f8d54"
+          fill="#12894f"
           fillOpacity="0.55"
         />
         <path
           d="M0,78 C200,30 420,116 660,70 C900,24 1120,108 1440,62 L1440,120 L0,120 Z"
-          fill="#2f4a24"
+          fill="#1f4d3a"
         />
       </svg>
 
-      <div className="relative overflow-hidden bg-gradient-to-b from-[#2f4a24] via-[#294020] to-[#1b2e13] text-[#f4efd8]">
+      <div className="relative overflow-hidden bg-gradient-to-b from-[#1f4d3a] via-[#245c43] to-[#1a4a35] text-[#eef7f1]">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -260,44 +221,21 @@ function RecipesFooter() {
             mixBlendMode: 'soft-light',
           }}
         />
-
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-32 top-0 size-[28rem] rounded-full bg-[#6f8d54]/25 blur-3xl"
+          className="pointer-events-none absolute -left-32 top-0 size-[28rem] rounded-full bg-[#12894f]/25 blur-3xl"
         />
-
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-24 bottom-0 size-[26rem] rounded-full bg-[#f7b32b]/10 blur-3xl"
         />
 
-        <div
-          className="eat-parallax pointer-events-none absolute -right-6 top-6 w-24 opacity-90 will-change-transform lg:right-10 lg:w-40"
-          style={drift(220, -30, 40)}
-        >
-          <Leaf tone="a" className="h-auto w-full drop-shadow-lg" />
-        </div>
-
-        <div
-          className="eat-parallax pointer-events-none absolute left-[6%] top-[38%] hidden w-14 will-change-transform lg:block"
-          style={drift(-160, 14, -60)}
-        >
-          <Lemon className="h-auto w-full drop-shadow-lg" />
-        </div>
-
-        <div
-          className="eat-parallax pointer-events-none absolute bottom-24 right-[30%] hidden w-16 opacity-70 will-change-transform lg:block"
-          style={drift(140, 52, 30)}
-        >
-          <Leaf tone="b" className="h-auto w-full" />
-        </div>
-
         <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-6 sm:pt-10 lg:px-8">
+          {/* Call to action */}
           <div className="flex flex-col items-start justify-between gap-8 border-b border-white/15 pb-12 lg:flex-row lg:items-end">
             <div className="max-w-2xl">
-              <p className="text-base text-[#f4efd8]/70">Hungry?</p>
-
-              <h2 className="mt-2 font-display text-4xl leading-[1.05] text-[#fbf6c8] sm:text-5xl lg:text-6xl">
+              <p className="text-base text-[#eef7f1]/70">Hungry?</p>
+              <h2 className="mt-2 font-display text-4xl leading-[1.05] text-[#e8f7ee] sm:text-5xl lg:text-6xl">
                 Let&apos;s cook something good
               </h2>
             </div>
@@ -305,57 +243,153 @@ function RecipesFooter() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/recipes"
-                className="inline-flex items-center gap-2 rounded-full bg-[#fbf6c8] px-7 py-3 text-sm font-semibold text-[#2f4a24] transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbf6c8] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2f4a24]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#e8f7ee] px-7 py-3 text-sm font-semibold text-[#1f4d3a] transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1f4d3a]"
               >
                 Browse recipes
                 <ArrowRight size={16} />
               </Link>
-
               <a
                 href="#browse"
-                className="inline-flex items-center rounded-full border border-white/35 px-7 py-3 text-sm font-semibold text-[#f4efd8] transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbf6c8]"
+                className="inline-flex items-center rounded-full border border-white/35 px-7 py-3 text-sm font-semibold text-[#eef7f1] transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee]"
               >
                 Latest recipes
               </a>
             </div>
           </div>
 
-          <div className="grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-12">
+          {/* Newsletter */}
+          <div
+            className="my-12 grid gap-8 rounded-2xl bg-white/[0.07] p-6 ring-1 ring-white/15 sm:p-10 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-12"
+            aria-labelledby="newsletter-heading"
+          >
+            <div className="flex items-start gap-4">
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#e8f7ee] text-[#1f4d3a]">
+                <Mail size={22} aria-hidden="true" />
+              </span>
+              <div>
+                <h3
+                  id="newsletter-heading"
+                  className="font-display text-2xl text-[#e8f7ee] sm:text-3xl"
+                >
+                  Join the EatsByTeks newsletter
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#eef7f1]/75">
+                  One easy recipe, a kitchen tip and the occasional new dish,
+                  straight to your inbox. No spam, unsubscribe any time.
+                </p>
+              </div>
+            </div>
+
+            {status === 'done' ? (
+              <p role="status" className="font-display text-lg text-[#e8f7ee]">
+                Almost there! Finish subscribing on Substack in the tab that
+                just opened.
+              </p>
+            ) : (
+              <form
+                onSubmit={subscribe}
+                className="flex flex-col gap-3 sm:flex-row sm:flex-wrap"
+              >
+                <label htmlFor="footer-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="footer-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email address"
+                  className="w-full flex-1 rounded-full bg-white px-5 py-3 text-sm text-[#1f4d3a] placeholder:text-[#1f4d3a]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee]"
+                />
+                <button
+                  type="submit"
+                  className="rounded-full bg-[#16a05d] px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#12894f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee]"
+                >
+                  Join now
+                </button>
+                <label
+                  htmlFor="footer-terms"
+                  className="flex items-start gap-3 text-sm leading-relaxed text-[#eef7f1]/80 sm:basis-full"
+                >
+                  <input
+                    id="footer-terms"
+                    type="checkbox"
+                    required
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="mt-1 size-4 shrink-0 accent-[#16a05d]"
+                  />
+                  <span>
+                    I agree to the{' '}
+                    <a
+                      href={FOOTER_LEGAL[1].href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#e8f7ee] underline underline-offset-4 hover:text-white"
+                    >
+                      Terms of Service
+                    </a>{' '}
+                    and{' '}
+                    <a
+                      href={FOOTER_LEGAL[0].href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#e8f7ee] underline underline-offset-4 hover:text-white"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </span>
+                </label>
+              </form>
+            )}
+          </div>
+
+          {/* Columns */}
+          <div className="grid gap-12 pb-14 pt-2 sm:grid-cols-2 lg:grid-cols-12">
             <div className="lg:col-span-5">
-              <p className="font-display text-3xl text-[#fbf6c8]">
+              <p className="font-display text-3xl text-[#e8f7ee]">
                 EatsByTeks
               </p>
-
-              <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#f4efd8]/75">
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#eef7f1]/75">
                 Everyday dinners and something sweet to finish, cooked in a real
                 kitchen and written down so you can cook them too.
               </p>
-
               <ul className="mt-6 flex flex-wrap gap-2">
-                {FOOTER_SOCIALS.map((social) => (
-                  <li key={social.label}>
+                {FOOTER_SOCIALS.map((s) => (
+                  <li key={s.label}>
                     <a
-                      href={social.href}
-                      className="inline-flex rounded-full border border-white/25 px-4 py-1.5 text-sm text-[#f4efd8] transition-colors hover:border-[#fbf6c8] hover:text-[#fbf6c8]"
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex rounded-full border border-white/25 px-4 py-1.5 text-sm text-[#eef7f1] transition-colors hover:border-[#e8f7ee] hover:text-[#e8f7ee]"
                     >
-                      {social.label}
+                      {s.label}
                     </a>
                   </li>
                 ))}
               </ul>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="mt-6 inline-flex items-center gap-2 text-sm text-[#e8f7ee] underline-offset-4 hover:text-white hover:underline"
+              >
+                <Mail size={18} aria-hidden="true" />
+                {CONTACT_EMAIL}
+              </a>
             </div>
 
             <nav aria-label="Explore" className="lg:col-span-2">
-              <h3 className="font-display text-lg text-[#fbf6c8]">Explore</h3>
-
+              <h3 className="font-display text-lg text-[#e8f7ee]">Explore</h3>
               <ul className="mt-4 space-y-3 text-sm">
-                {FOOTER_EXPLORE.map((item) => (
-                  <li key={item.label}>
+                {FOOTER_EXPLORE.map((l) => (
+                  <li key={l.label}>
                     <Link
-                      href={item.href}
-                      className="text-[#f4efd8]/80 underline-offset-4 transition-colors hover:text-[#fbf6c8] hover:underline"
+                      href={l.href}
+                      className="text-[#eef7f1]/80 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
                     >
-                      {item.label}
+                      {l.label}
                     </Link>
                   </li>
                 ))}
@@ -363,18 +397,17 @@ function RecipesFooter() {
             </nav>
 
             <nav aria-label="Categories" className="lg:col-span-2">
-              <h3 className="font-display text-lg text-[#fbf6c8]">
+              <h3 className="font-display text-lg text-[#e8f7ee]">
                 Categories
               </h3>
-
               <ul className="mt-4 space-y-3 text-sm">
-                {FOOTER_CATEGORIES.map((category) => (
-                  <li key={category}>
+                {FOOTER_CATEGORIES.map((c) => (
+                  <li key={c}>
                     <Link
-                      href={`/recipes?category=${encodeURIComponent(category)}`}
-                      className="text-[#f4efd8]/80 underline-offset-4 transition-colors hover:text-[#fbf6c8] hover:underline"
+                      href={`/recipes?category=${encodeURIComponent(c)}`}
+                      className="text-[#eef7f1]/80 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
                     >
-                      {category}
+                      {c}
                     </Link>
                   </li>
                 ))}
@@ -382,35 +415,39 @@ function RecipesFooter() {
             </nav>
 
             <div className="lg:col-span-3">
-              <h3 className="font-display text-lg text-[#fbf6c8]">
+              <h3 className="font-display text-lg text-[#e8f7ee]">
                 How we cook
               </h3>
-
-              <ul className="mt-4 space-y-3 text-sm text-[#f4efd8]/80">
-                {PILLARS.map((pillar) => (
-                  <li
-                    key={pillar.label}
-                    className="flex items-center gap-3"
-                  >
-                    <Leaf tone="a" className="h-5 w-auto shrink-0" />
-                    {pillar.label}
-                  </li>
+              <ul className="mt-4 space-y-3 text-sm text-[#eef7f1]/80">
+                {PILLARS.map((p) => (
+                  <li key={p.label}>{p.label}</li>
                 ))}
               </ul>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-sm text-[#f4efd8]/60 sm:flex-row">
-            <p>
-              © {year} EatsByTeks. All recipes tested in our own kitchen.
-            </p>
-
-            <a
-              href="#hero-heading"
-              className="underline-offset-4 transition-colors hover:text-[#fbf6c8] hover:underline"
-            >
-              Back to top
-            </a>
+          {/* Bottom bar */}
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-sm text-[#eef7f1]/60 sm:flex-row">
+            <p>© {year} EatsByTeks. All recipes tested in our own kitchen.</p>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              {FOOTER_LEGAL.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
+                >
+                  {l.label}
+                </a>
+              ))}
+              <a
+                href="#hero-heading"
+                className="underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
+              >
+                Back to top
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -530,16 +567,11 @@ function RecipesContent() {
     .map((term) => term.trim())
     .filter(Boolean)
 
+  /* Chips work one at a time: picking one replaces the previous pick,
+     and clicking the highlighted chip again clears it. */
   const toggleTerm = (ingredient: string) => {
     const key = ingredient.toLowerCase()
-
-    setQuery(
-      (
-        terms.includes(key)
-          ? terms.filter((term) => term !== key)
-          : [...terms, key]
-      ).join(', '),
-    )
+    setQuery(terms.length === 1 && terms[0] === key ? '' : key)
   }
 
   const showCategories =
@@ -576,6 +608,10 @@ function RecipesContent() {
     recipes.find((recipe: Recipe) => recipe.id === 27) ??
     recipes[1] ??
     recipes[0]
+  const heroC: Recipe | undefined =
+    heroPool[2] ??
+    recipes.find((recipe: Recipe) => recipe.id !== heroA?.id && recipe.id !== heroB?.id) ??
+    recipes[2]
 
   const quick = recipes
     .filter((recipe: Recipe) => minutes(recipe.time) <= 30)
@@ -687,8 +723,7 @@ function RecipesContent() {
             aria-hidden="true"
             className="eat-parallax pointer-events-none absolute -inset-x-10 -top-10 bottom-0 bg-[radial-gradient(circle_at_85%_15%,#2f6a45_0%,transparent_50%),radial-gradient(circle_at_5%_90%,#1d4a31_0%,transparent_45%)]"
             style={{
-              transform:
-                'translate3d(0, calc(var(--sy) * 0.15px), 0)',
+              transform: 'translate3d(0, calc(var(--sy) * 0.1px), 0)',
             }}
           />
 
@@ -698,11 +733,11 @@ function RecipesContent() {
             style={{
               backgroundImage:
                 'radial-gradient(rgba(246,241,196,0.14) 1.2px, transparent 1.6px)',
-              backgroundSize: '22px 22px',
+              backgroundSize: '24px 24px',
               WebkitMaskImage:
-                'radial-gradient(ellipse at 72% 40%, #000 0%, transparent 62%)',
+                'radial-gradient(ellipse at 20% 30%, #000 0%, transparent 60%)',
               maskImage:
-                'radial-gradient(ellipse at 72% 40%, #000 0%, transparent 62%)',
+                'radial-gradient(ellipse at 20% 30%, #000 0%, transparent 60%)',
             }}
           />
 
@@ -711,12 +746,11 @@ function RecipesContent() {
             className="pointer-events-none absolute right-[4%] top-[42%] hidden size-[30rem] -translate-y-1/2 rounded-full bg-[#2f6a45]/40 blur-3xl lg:block"
           />
 
-          <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-8 lg:pb-24 lg:pt-24">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-24 pt-14 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:px-8 lg:pb-28 lg:pt-24">
             <div
               className="eat-parallax"
               style={{
-                transform:
-                  'translate3d(0, calc(var(--sy) * 0.12px), 0)',
+                transform: 'translate3d(0, calc(var(--sy) * 0.1px), 0)',
                 opacity: 'max(0.2, calc(1 - var(--sy) / 650))',
               }}
             >
@@ -729,8 +763,8 @@ function RecipesContent() {
                 </Link>
               )}
 
-              <p className="eat-rise inline-flex items-center gap-3 text-sm font-semibold text-[#bfe0b4]">
-                <Leaf tone="a" className="h-6 w-auto" />
+              <p className="eat-rise inline-flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-[#bfe0b4] ring-1 ring-white/15">
+                <span className="size-2 rounded-full bg-[#bfe0b4]" />
                 {inCategory
                   ? activeTile?.sub ?? 'EatsByTeks recipes'
                   : 'EatsByTeks recipe index'}
@@ -738,162 +772,181 @@ function RecipesContent() {
 
               <h1
                 id="hero-heading"
-                className="eat-rise eat-rise-2 mt-5 font-display text-5xl leading-[1.04] text-[#fbf8dc] sm:text-6xl xl:text-7xl"
+                className="eat-rise eat-rise-2 mt-6 font-display text-5xl leading-[1.02] text-[#fbf8dc] sm:text-6xl xl:text-7xl"
               >
                 {inCategory ? (
                   category
                 ) : (
                   <>
                     Cook something
-                    <span className="block italic text-[#bfe0b4]">
+                    <span className="relative mt-1 block w-fit italic text-[#f6f1c4]">
                       worth sharing
+                      <svg
+                        viewBox="0 0 300 14"
+                        preserveAspectRatio="none"
+                        className="absolute -bottom-2 left-0 h-3 w-full"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M2 9 C60 2 120 13 180 6 C230 1 270 9 298 5"
+                          stroke="#8fb88a"
+                          strokeWidth="3.5"
+                          fill="none"
+                          strokeLinecap="round"
+                        />
+                      </svg>
                     </span>
                   </>
                 )}
               </h1>
 
-              <p className="eat-rise eat-rise-3 mt-6 max-w-md text-base leading-relaxed text-[#d4e8cc] sm:text-lg">
+              <p className="eat-rise eat-rise-3 mt-8 max-w-md border-l-2 border-[#8fb88a]/60 pl-4 text-base leading-relaxed text-[#d4e8cc] sm:text-lg">
                 {inCategory
                   ? 'Pick a meal to see its full recipe, ingredients and method.'
                   : 'Search by dish or by what is in your kitchen, then cook it step by step.'}
               </p>
 
-              <form
-                onSubmit={jumpToBrowse}
-                className="eat-rise eat-rise-3 mt-9 flex max-w-xl items-center rounded-full bg-white p-1.5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.65)] ring-4 ring-white/10 transition-shadow focus-within:ring-[#8fb88a]/50"
-              >
-                <label className="relative flex flex-1 items-center">
-                  <Search className="pointer-events-none absolute left-4 size-4 text-[#2f6a45]" />
+              <div className="eat-rise eat-rise-3 mt-9 max-w-xl rounded-[1.75rem] bg-white p-2 shadow-[0_28px_60px_-20px_rgba(0,0,0,0.65)] ring-4 ring-white/10 transition-shadow focus-within:ring-[#8fb88a]/50">
+                <form onSubmit={jumpToBrowse} className="flex items-center">
+                  <label className="relative flex flex-1 items-center">
+                    <Search className="pointer-events-none absolute left-4 size-4 text-[#2f6a45]" />
 
-                  <input
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    type="search"
-                    placeholder="Try garlic, basil or chicken"
-                    aria-label="Search recipes or ingredients"
-                    className="h-12 w-full rounded-full bg-transparent pr-3 text-sm text-[#123222] outline-none placeholder:text-[#123222]/45"
-                    style={{ paddingLeft: '2.75rem' }}
-                  />
-                </label>
+                    <input
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      type="search"
+                      placeholder="Try garlic, basil or chicken"
+                      aria-label="Search recipes or ingredients"
+                      className="h-12 w-full rounded-full bg-transparent pr-3 text-sm text-[#123222] outline-none placeholder:text-[#123222]/45"
+                      style={{ paddingLeft: '2.75rem' }}
+                    />
+                  </label>
 
-                <button type="submit" className={`${primaryBtn} h-12 px-6`}>
-                  Find recipes
-                </button>
-              </form>
+                  <button type="submit" className={`${primaryBtn} h-12 px-6`}>
+                    Find recipes
+                  </button>
+                </form>
 
-              <div className="eat-rise eat-rise-3 mt-5 flex max-w-xl flex-wrap items-center gap-2">
-                <span className="text-xs font-medium text-[#bfe0b4]">
-                  Popular:
-                </span>
+                <div className="mt-2 flex flex-wrap items-center gap-2 rounded-2xl bg-[#eaf3df] px-4 py-3">
+                  <span className="mr-1 text-xs font-semibold text-[#2f6a45]">
+                    Popular
+                  </span>
 
-                {popularIngredients
-                  .slice(0, 6)
-                  .map((ingredient: string) => {
-                    const on = terms.includes(ingredient.toLowerCase())
+                  {popularIngredients
+                    .slice(0, 6)
+                    .map((ingredient: string) => {
+                      const on = terms.includes(ingredient.toLowerCase())
+
+                      return (
+                        <button
+                          key={ingredient}
+                          type="button"
+                          aria-pressed={on}
+                          onClick={() => toggleTerm(ingredient)}
+                          className={`rounded-full border px-3.5 py-1 text-xs font-semibold transition-colors ${
+                            on
+                              ? 'border-[#123222] bg-[#123222] text-[#f6f1c4]'
+                              : 'border-[#bcd7aa] bg-white text-[#123222] hover:border-[#2f6a45]'
+                          }`}
+                        >
+                          {ingredient}
+                        </button>
+                      )
+                    })}
+                </div>
+              </div>
+
+              <p className="mt-3 max-w-xl px-2 text-xs text-[#bfe0b4]/80">
+                Pick one ingredient, or type several separated by commas.
+              </p>
+
+              <div className="eat-rise eat-rise-3 mt-9 max-w-xl">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#bfe0b4]">
+                    Jump to
+                  </span>
+                  <span className="h-px flex-1 bg-white/15" />
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {categories.slice(1).map((value: string) => {
+                    const on = value === category
 
                     return (
                       <button
-                        key={ingredient}
+                        key={value}
                         type="button"
                         aria-pressed={on}
-                        onClick={() => toggleTerm(ingredient)}
-                        className={`rounded-full border px-3.5 py-1 text-xs font-semibold transition-colors ${
+                        onClick={() => {
+                          setOnlySaved(false)
+                          goToCategory(value)
+                        }}
+                        className={`inline-flex items-center gap-2 rounded-full py-2 pl-4 pr-2.5 text-xs font-semibold transition-colors ${
                           on
-                            ? 'border-[#f6f1c4] bg-[#f6f1c4] text-[#123222]'
-                            : 'border-white/25 text-[#d4e8cc] hover:border-[#f6f1c4] hover:text-[#f6f1c4]'
+                            ? 'bg-[#f6f1c4] text-[#123222]'
+                            : 'bg-white/10 text-[#f6f1c4] ring-1 ring-white/15 hover:bg-white/20'
                         }`}
                       >
-                        {ingredient}
+                        {value}
+                        <span
+                          className={`grid min-w-5 place-items-center rounded-full px-1.5 py-0.5 text-[0.65rem] ${
+                            on ? 'bg-[#123222]/10' : 'bg-white/15'
+                          }`}
+                        >
+                          {countFor(value)}
+                        </span>
                       </button>
                     )
                   })}
-              </div>
-
-              <p className="mt-3 text-xs text-[#bfe0b4]/80">
-                Separate ingredients with commas to narrow the list.
-              </p>
-
-              <div className="eat-rise eat-rise-3 mt-8 flex max-w-xl flex-wrap items-center gap-2 border-t border-white/15 pt-6">
-                <span className="mr-1 text-xs font-medium text-[#bfe0b4]">
-                  Jump to:
-                </span>
-
-                {categories.slice(1).map((value: string) => {
-                  const on = value === category
-
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => {
-                        setOnlySaved(false)
-                        goToCategory(value)
-                      }}
-                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                        on
-                          ? 'bg-[#f6f1c4] text-[#123222]'
-                          : 'bg-white/10 text-[#f6f1c4] hover:bg-white/20'
-                      }`}
-                    >
-                      {value}
-                    </button>
-                  )
-                })}
+                </div>
               </div>
             </div>
 
-            <div className="relative mx-auto aspect-[1/1.1] w-full max-w-md lg:ml-auto lg:mr-0">
-              {heroA && (
-                <Link
-                  href={`/recipe/${recipeSlug(heroA)}`}
-                  className="eat-rise absolute right-0 top-0 block w-[62%] border border-[#123222]/10 bg-white p-2 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.7)]"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={heroA.image}
-                    alt={heroA.title}
-                    className="aspect-[3/4] w-full object-cover"
-                  />
-                </Link>
-              )}
+            <div className="relative mx-auto w-full max-w-lg lg:ml-auto lg:mr-0">
+              <div className="grid grid-cols-3 items-end gap-3 sm:gap-4">
+                {[
+                  { recipe: heroB, shape: 'aspect-[3/4]', offset: 'mb-10', rise: 'eat-rise-2' },
+                  { recipe: heroA, shape: 'aspect-[3/5]', offset: '', rise: '' },
+                  { recipe: heroC, shape: 'aspect-[3/4]', offset: 'mb-20', rise: 'eat-rise-3' },
+                ].map(
+                  (item, index) =>
+                    item.recipe && (
+                      <Link
+                        key={`${item.recipe.id}-${index}`}
+                        href={`/recipe/${recipeSlug(item.recipe)}`}
+                        className={`eat-rise ${item.rise} ${item.offset} group block`}
+                      >
+                        <div
+                          className={`relative ${item.shape} overflow-hidden rounded-t-full rounded-b-2xl bg-[#d7e9c8] shadow-[0_40px_70px_-30px_rgba(0,0,0,0.7)] ring-4 ring-white`}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.recipe.image}
+                            alt={item.recipe.title}
+                            className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        </div>
+                      </Link>
+                    ),
+                )}
+              </div>
 
-              {heroB && (
-                <Link
-                  href={`/recipe/${recipeSlug(heroB)}`}
-                  className="eat-rise eat-rise-2 absolute bottom-0 left-0 z-10 block w-[50%] border border-[#123222]/10 bg-white p-2 shadow-[0_40px_70px_-30px_rgba(0,0,0,0.7)]"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={heroB.image}
-                    alt={heroB.title}
-                    className="aspect-[3/4] w-full object-cover"
-                  />
-                </Link>
-              )}
-
               {heroA && (
-                <div className="eat-rise eat-rise-3 absolute right-[2%] top-[62%] z-20 max-w-[12.5rem] rounded-xl bg-white px-4 py-3 text-[#123222] shadow-xl">
-                  <p className="text-xs font-semibold leading-snug">
+                <div className="eat-rise eat-rise-3 absolute -bottom-6 left-1/2 z-20 w-[16rem] max-w-[90%] -translate-x-1/2 rounded-2xl bg-white px-5 py-4 text-[#123222] shadow-xl">
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-[#2f6a45]">
+                    {inCategory ? `Fresh in ${category}` : 'Cook this now'}
+                  </p>
+
+                  <p className="mt-1 text-sm font-semibold leading-snug">
                     {heroA.title}
                   </p>
 
-                  <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-[#123222]/60">
+                  <p className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-[#123222]/60">
                     <Clock3 size={13} className="text-[#2f6a45]" />
                     {heroA.time}
                   </p>
                 </div>
               )}
-
-              <Leaf
-                tone="a"
-                className="pointer-events-none absolute -left-6 top-2 hidden w-16 rotate-[24deg] opacity-40 sm:block"
-              />
-
-              <Leaf
-                tone="b"
-                className="pointer-events-none absolute -right-4 bottom-4 hidden w-14 -rotate-[28deg] opacity-40 sm:block"
-              />
             </div>
           </div>
         </section>

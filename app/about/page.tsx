@@ -22,7 +22,6 @@ export const metadata: Metadata = {
 const CHEF_PHOTO = '/assets/chef.jpeg'
 const PLATE = '/assets/recipe-cake.jpg'
 const BOWL = '/assets/recipe-bowl.jpg'
-const COOKING = '/assets/lamb.chops.jpeg' /* Olive at the stove, a different shot from the cake */
 
 /*
   Palette
@@ -45,12 +44,12 @@ const WAYS = [
 ]
 
 const EQUIPMENT = [
-  { name: 'Cast iron skillet', img: '/assets/equipment-skillet.jpg' },
-  { name: "Chef's knife", img: '/assets/equipment-knife.jpg' },
-  { name: 'Stand mixer', img: '/assets/equipment-mixer.jpg' },
-  { name: 'Dutch oven', img: '/assets/equipment-dutch-oven.jpg' },
-  { name: 'Wooden spoons', img: '/assets/equipment-spoons.jpg' },
-  { name: 'Cake tins', img: '/assets/equipment-tins.jpg' },
+  { name: 'Cast iron skillet', text: 'Holds steady heat for searing, frying and one-pan dinners.' },
+  { name: "Chef's knife", text: 'One sharp knife for chopping, slicing and dicing almost everything.' },
+  { name: 'Stand mixer', text: 'Takes the work out of batters, doughs and whipped cream.' },
+  { name: 'Dutch oven', text: 'Where the slow-cooked stews, soups and loaves come together.' },
+  { name: 'Wooden spoons', text: 'Gentle on pans, comfortable in the hand and used every day.' },
+  { name: 'Cake tins', text: 'For evenly baked sponges that lift out cleanly.' },
 ]
 
 const SOCIALS = [
@@ -119,18 +118,6 @@ function Leaf({ tone = 'a', className = '' }: { tone?: 'a' | 'b'; className?: st
   )
 }
 
-function Lemon({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 90" className={className} aria-hidden="true">
-      <path
-        d="M6 45 C6 45 20 40 30 24 C46 4 86 6 100 30 C104 36 108 42 114 45 C108 48 104 54 100 60 C86 84 46 86 30 66 C20 50 6 45 6 45 Z"
-        fill="#f7d44a"
-      />
-      <path d="M30 30 C48 14 80 16 94 34" stroke="#fff" strokeOpacity=".45" strokeWidth="4" fill="none" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 /* ---- Footer below is exactly as provided ---- */
 
 function SiteFooter() {
@@ -171,35 +158,6 @@ function SiteFooter() {
           aria-hidden="true"
           className="pointer-events-none absolute -right-24 bottom-0 size-[26rem] rounded-full bg-[#f7b32b]/10 blur-3xl"
         />
-
-        {/* botanicals that drift as the page scrolls */}
-        <div
-          data-speed="0.25"
-          data-x="-0.12"
-          data-rot="-30"
-          data-spin="0.03"
-          className="pointer-events-none absolute -right-6 top-6 w-24 opacity-90 will-change-transform lg:right-10 lg:w-40"
-        >
-          <Leaf tone="a" className="h-auto w-full drop-shadow-lg" />
-        </div>
-        <div
-          data-speed="-0.2"
-          data-x="0.12"
-          data-rot="14"
-          data-spin="0.06"
-          className="pointer-events-none absolute left-[6%] top-[38%] hidden w-14 will-change-transform lg:block"
-        >
-          <Lemon className="h-auto w-full drop-shadow-lg" />
-        </div>
-        <div
-          data-speed="0.18"
-          data-x="0.1"
-          data-rot="52"
-          data-spin="-0.03"
-          className="pointer-events-none absolute bottom-24 right-[30%] hidden w-16 opacity-70 will-change-transform lg:block"
-        >
-          <Leaf tone="b" className="h-auto w-full" />
-        </div>
 
         <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-6 sm:pt-10 lg:px-8">
           {/* Call to action */}
@@ -286,10 +244,7 @@ function SiteFooter() {
               <h3 className="font-display text-lg text-[#fbf6c8]">How we cook</h3>
               <ul className="mt-4 space-y-3 text-sm text-[#f4efd8]/80">
                 {PILLARS.map((p) => (
-                  <li key={p.label} className="flex items-center gap-3">
-                    <Leaf tone="a" className="h-5 w-auto shrink-0" />
-                    {p.label}
-                  </li>
+                  <li key={p.label}>{p.label}</li>
                 ))}
               </ul>
             </div>
@@ -522,8 +477,8 @@ export default function AboutPage() {
 
         <div className="mx-auto max-w-7xl px-5 pb-20 pt-24 lg:px-8">
           {/* PHILOSOPHY */}
-          <section className="grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
-            <div>
+          <section>
+            <div className="max-w-2xl">
               <h2 data-g="fade" className="font-display text-3xl text-[#123222]">Chef’s philosophy</h2>
               <div data-g="fade">{rule}</div>
               <p data-g="fade" aria-hidden="true" className="mt-6 font-display text-6xl leading-none text-[#2f6a45]">“</p>
@@ -536,43 +491,34 @@ export default function AboutPage() {
                 If a dish can’t be cooked the same way twice, it doesn’t make it onto the page.
               </p>
             </div>
-
-            <div data-g="fade" className={card}>
-              <div className="aspect-[5/4] overflow-hidden">
-                <img data-g="par" src={COOKING} alt="Chef Olive cooking at the stove" loading="lazy" className="h-[118%] w-full object-cover" />
-              </div>
-              <p className={caption}>Olive at the stove, testing a recipe</p>
-            </div>
           </section>
 
           {/* MY KITCHEN EQUIPMENT */}
-          <section data-g="fade" className="mt-24 border-t border-[#123222]/20 pt-14">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="font-display text-3xl text-[#123222]">My kitchen equipment</h2>
-              <Link
-                href="/recipes"
-                className="inline-flex items-center gap-2 rounded-full bg-[#2f6a45] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#123222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#123222] focus-visible:ring-offset-2"
-              >
-                View all <ArrowRight size={16} />
-              </Link>
-            </div>
-            {rule}
+          <section data-g="fade" className="mt-24">
+            <div className="grid gap-10 rounded-[2rem] bg-[#2f6a45] p-8 sm:p-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14 lg:p-14">
+              <div className="flex flex-col justify-center">
+                <p className="font-display text-xl italic text-[#bfe0b4]">In Olive’s kitchen</p>
+                <h2 className="mt-3 font-display text-4xl leading-tight text-white sm:text-5xl">
+                  My kitchen equipment
+                </h2>
+                <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/75">
+                  Six tools Olive reaches for every day, and the reason each one earns its place on the counter.
+                </p>
+              </div>
 
-            <ul data-g="stagger" className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {EQUIPMENT.map(({ name, img }) => (
-                <li key={name} className={card}>
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <img
-                      src={img}
-                      alt={name}
-                      loading="lazy"
-                      className="size-full object-cover transition-transform duration-700 hover:scale-105"
-                    />
-                  </div>
-                  <p className={caption}>{name}</p>
-                </li>
-              ))}
-            </ul>
+              <ul data-g="stagger" className="grid gap-4 sm:grid-cols-2">
+                {EQUIPMENT.map(({ name, text }, i) => (
+                  <li
+                    key={name}
+                    className="rounded-2xl bg-white/[0.07] p-6 ring-1 ring-white/15 transition-colors hover:bg-white/[0.12]"
+                  >
+                    <span className="font-display text-sm text-[#bfe0b4]">{String(i + 1).padStart(2, '0')}</span>
+                    <p className="mt-3 font-display text-xl text-white">{name}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-white/75">{text}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
 
           {/* HOW WE COOK */}
