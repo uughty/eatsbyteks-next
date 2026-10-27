@@ -3,16 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Menu, X, ArrowUpRight, ArrowRight, ShoppingBasket } from 'lucide-react'
+import { Menu, X, ArrowUpRight, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollMotion } from '@/components/ScrollMotion'
 import { BackToTop } from '@/components/BackToTop'
 
-
 const links = [
   { to: '/', label: 'Home' },
   { to: '/recipes', label: 'Recipes' },
-  
   { to: '/about', label: 'About' },
   { to: '/kenyan-food', label: 'Kenyan Dishes' },
 ]
@@ -28,8 +26,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
-  const remaining = 0
-
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 12)
     on()
@@ -37,16 +33,29 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('scroll', on)
   }, [])
 
-  /* Close the mobile menu on navigation or Escape */
+  /* Close the mobile menu on navigation */
   useEffect(() => setOpen(false), [pathname])
+
+  /* While the menu is open: Escape closes it and the page behind cannot scroll */
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
   }, [open])
 
-  
+  /* Close the menu if the screen grows into the desktop layout */
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => mq.matches && setOpen(false)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
 
   const mobileLinks = [...links, { to: '/shopping-list', label: 'Shopping list' }]
 
@@ -63,7 +72,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         }`}
       >
         <div
-          className={`mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-5 px-5 transition-all duration-300 md:grid-cols-[1fr_auto_1fr] lg:px-8 ${
+          className={`mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-5 px-5 transition-all duration-300 lg:grid-cols-[1fr_auto_1fr] lg:px-8 ${
             scrolled ? 'h-[60px]' : 'h-[76px]'
           }`}
         >
@@ -83,7 +92,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* centred links, underline grows on hover */}
-          <nav className="hidden items-center gap-9 md:flex" aria-label="Main navigation">
+          <nav className="hidden items-center gap-6 lg:flex xl:gap-9" aria-label="Main navigation">
             {links.map((link) => {
               const active = isActive(pathname, link.to)
               return (
@@ -108,8 +117,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* actions */}
-          <div className="hidden items-center justify-end gap-3 md:flex">
-           
+          <div className="hidden items-center justify-end gap-3 lg:flex">
             <Button
               asChild
               size="sm"
@@ -121,14 +129,24 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
 
-          
+          {/* menu button (phones and tablets) */}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            className="grid size-11 place-items-center justify-self-end rounded-full text-[#123222] transition-colors hover:bg-[#123222]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2f6a45] lg:hidden"
+          >
+            {open ? <X size={26} /> : <Menu size={26} />}
+          </button>
         </div>
 
         {/* mobile panel */}
         <nav
           id="mobile-menu"
           aria-label="Mobile navigation"
-          className={`absolute inset-x-0 top-full border-b border-[#123222]/15 bg-[#cfe3c0] px-5 pb-6 pt-2 shadow-[0_30px_40px_-30px_rgba(18,50,34,0.6)] transition-all duration-300 md:hidden ${
+          className={`absolute inset-x-0 top-full max-h-[calc(100svh-76px)] overflow-y-auto overscroll-contain border-b border-[#123222]/15 bg-[#cfe3c0] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_30px_40px_-30px_rgba(18,50,34,0.6)] transition-all duration-300 lg:hidden ${
             open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0'
           }`}
         >
@@ -152,7 +170,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               )
             })}
           </ul>
-          <Button asChild className="mt-4 h-12 w-full rounded-full bg-[#123222] font-semibold text-[#f6f1c4] hover:bg-[#2f6a45]">
+          <Button
+            asChild
+            className="mt-4 h-12 w-full rounded-full bg-[#123222] font-semibold text-[#f6f1c4] hover:bg-[#2f6a45]"
+          >
             <Link href="/recipes" onClick={() => setOpen(false)}>
               Find a recipe <ArrowUpRight />
             </Link>

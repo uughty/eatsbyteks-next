@@ -13,20 +13,22 @@ import { recipeSlug, recipes } from '@/lib/recipes'
 import type { Recipe } from '@/lib/recipes'
 import { useRecipeShelf } from '@/lib/useRecipeShelf'
 
-/* Card photo: a tall 3:4 rectangle that fills its frame, sharp corners.
-   Every image on the homepage uses this one shape. */
 const SQUARE_IMG = 'aspect-[3/4] w-full object-cover'
 
-/* Card used for image lists (thin border, image inset, title underneath). */
+/* Image size hints so phones download phone-sized files */
+const CARD_SIZES = '(max-width: 640px) 75vw, (max-width: 1024px) 33vw, 400px'
+
 const CARD =
   'block border border-[#1f4d3a]/10 bg-white p-3 transition-shadow hover:shadow-[0_16px_36px_-24px_rgba(31,77,58,0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e6a4f]'
 
-/* Only these recipes appear on the homepage. Change the slice to pick others. */
+/* Swipe carousel on phones, 3-column grid from sm up */
+const CAROUSEL =
+  '-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-8 sm:overflow-visible sm:px-0 sm:pb-0'
+const CAROUSEL_ITEM = 'w-[75%] shrink-0 snap-center sm:w-auto'
+
 const homeRecipes: Recipe[] = recipes.slice(0, 4)
 const pick = (i: number): Recipe => homeRecipes[i] ?? homeRecipes[0]
 
-/* The three clickable dishes right before the footer.
-   Change these recipe ids to feature other dishes. */
 const TRENDING_IDS = [27, 24, 18]
 const trending: Recipe[] = (() => {
   const chosen = TRENDING_IDS.map((id) => recipes.find((r: Recipe) => r.id === id)).filter(
@@ -200,6 +202,7 @@ function DishRow({
               alt={recipe.title}
               width={600}
               height={600}
+              sizes="(max-width: 640px) 85vw, (max-width: 1024px) 60vw, 400px"
               className={SQUARE_IMG}
             />
           </Link>
@@ -326,13 +329,14 @@ function SiteFooter() {
           className="pointer-events-none absolute inset-0"
           style={{ backgroundImage: GRAIN, opacity: 0.55, mixBlendMode: 'soft-light' }}
         />
+        {/* heavy blur circles: hidden on phones to keep scrolling smooth */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-32 top-0 size-[28rem] rounded-full bg-[#12894f]/25 blur-3xl"
+          className="pointer-events-none absolute -left-32 top-0 hidden size-[28rem] rounded-full bg-[#12894f]/25 blur-3xl sm:block"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-24 bottom-0 size-[26rem] rounded-full bg-[#f7b32b]/10 blur-3xl"
+          className="pointer-events-none absolute -right-24 bottom-0 hidden size-[26rem] rounded-full bg-[#f7b32b]/10 blur-3xl sm:block"
         />
 
         <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-6 sm:pt-10 lg:px-8">
@@ -391,6 +395,7 @@ function SiteFooter() {
                 <label htmlFor="footer-email" className="sr-only">
                   Email address
                 </label>
+                {/* text-base on phones stops iOS zooming in on focus */}
                 <input
                   id="footer-email"
                   type="email"
@@ -399,7 +404,7 @@ function SiteFooter() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address"
-                  className="w-full flex-1 rounded-full bg-white px-5 py-3 text-sm text-[#1f4d3a] placeholder:text-[#1f4d3a]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee]"
+                  className="w-full flex-1 rounded-full bg-white px-5 py-3 text-base text-[#1f4d3a] placeholder:text-[#1f4d3a]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8f7ee] sm:text-sm"
                 />
                 <button
                   type="submit"
@@ -417,7 +422,7 @@ function SiteFooter() {
                     required
                     checked={agreed}
                     onChange={(e) => setAgreed(e.target.checked)}
-                    className="mt-1 size-4 shrink-0 accent-[#16a05d]"
+                    className="mt-0.5 size-5 shrink-0 accent-[#16a05d]"
                   />
                   <span>
                     I agree to the{' '}
@@ -460,7 +465,7 @@ function SiteFooter() {
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex rounded-full border border-white/25 px-4 py-1.5 text-sm text-[#eef7f1] transition-colors hover:border-[#e8f7ee] hover:text-[#e8f7ee]"
+                      className="inline-flex rounded-full border border-white/25 px-4 py-2 text-sm text-[#eef7f1] transition-colors hover:border-[#e8f7ee] hover:text-[#e8f7ee]"
                     >
                       {s.label}
                     </a>
@@ -469,21 +474,21 @@ function SiteFooter() {
               </ul>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className="mt-6 inline-flex items-center gap-2 text-sm text-[#e8f7ee] underline-offset-4 hover:text-white hover:underline"
+                className="mt-6 inline-flex items-center gap-2 break-all text-sm text-[#e8f7ee] underline-offset-4 hover:text-white hover:underline"
               >
-                <Mail size={18} aria-hidden="true" />
+                <Mail size={18} aria-hidden="true" className="shrink-0" />
                 {CONTACT_EMAIL}
               </a>
             </div>
 
             <nav aria-label="Explore" className="lg:col-span-2">
               <h3 className="font-display text-lg text-[#e8f7ee]">Explore</h3>
-              <ul className="mt-4 space-y-3 text-sm">
+              <ul className="mt-3 space-y-1 text-sm">
                 {FOOTER_EXPLORE.map((l) => (
                   <li key={l.label}>
                     <Link
                       href={l.href}
-                      className="text-[#eef7f1]/80 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
+                      className="inline-block py-2 text-[#eef7f1]/80 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
                     >
                       {l.label}
                     </Link>
@@ -494,12 +499,12 @@ function SiteFooter() {
 
             <nav aria-label="Categories" className="lg:col-span-2">
               <h3 className="font-display text-lg text-[#e8f7ee]">Categories</h3>
-              <ul className="mt-4 space-y-3 text-sm">
+              <ul className="mt-3 space-y-1 text-sm">
                 {FOOTER_CATEGORIES.map((c) => (
                   <li key={c}>
                     <Link
                       href={`/recipes?category=${encodeURIComponent(c)}`}
-                      className="text-[#eef7f1]/80 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
+                      className="inline-block py-2 text-[#eef7f1]/80 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
                     >
                       {c}
                     </Link>
@@ -519,23 +524,23 @@ function SiteFooter() {
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-sm text-[#eef7f1]/60 sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/15 pt-6 text-center text-sm text-[#eef7f1]/60 sm:flex-row sm:text-left">
             <p>© {year} EatsByTeks. All recipes tested in our own kitchen.</p>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
               {FOOTER_LEGAL.map((l) => (
                 <a
                   key={l.label}
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
+                  className="py-2 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
                 >
                   {l.label}
                 </a>
               ))}
               <a
                 href="#hero-heading"
-                className="underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
+                className="py-2 underline-offset-4 transition-colors hover:text-[#e8f7ee] hover:underline"
               >
                 Back to top
               </a>
@@ -561,20 +566,20 @@ function CookieBanner() {
       role="dialog"
       aria-live="polite"
       aria-label="Cookie consent"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-2xl bg-white p-5 shadow-[0_20px_50px_-15px_rgba(31,77,58,0.55)] ring-1 ring-[#2e6a4f]/15 sm:inset-x-6 sm:p-6"
+      className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 mx-auto max-h-[70svh] max-w-3xl overflow-y-auto rounded-2xl bg-white p-4 shadow-[0_20px_50px_-15px_rgba(31,77,58,0.55)] ring-1 ring-[#2e6a4f]/15 sm:inset-x-6 sm:bottom-4 sm:p-6"
     >
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
         <div>
           <p className="font-display text-lg text-[#1f4d3a]">
             Do you want to accept cookies?
           </p>
-          <p className="mt-1 text-sm leading-relaxed text-[#1f4d3a]/70">
+          <p className="mt-1 text-xs leading-relaxed text-[#1f4d3a]/70 sm:text-sm">
             We use cookies to keep the site working, remember your saved
             recipes and understand how people use EatsByTeks. You can accept or
             decline non-essential cookies.
           </p>
         </div>
-        <div className="flex shrink-0 gap-3">
+        <div className="grid shrink-0 grid-cols-2 gap-3 sm:flex">
           <Button
             type="button"
             variant="outline"
@@ -620,7 +625,7 @@ export function HomePage() {
 
   return (
     <SiteLayout>
-      <main>
+      <main className="overflow-x-clip">
         {/* HERO: text only, one centred block on the original green */}
         <section
           className="relative isolate overflow-hidden bg-[#2e6a4f]"
@@ -636,7 +641,7 @@ export function HomePage() {
             className="pointer-events-none absolute -z-10 bottom-0 left-[40%] h-[42%] w-[22%] bg-black/[0.06]"
           />
 
-          <div className="relative mx-auto flex min-h-[88vh] max-w-4xl flex-col items-center justify-center px-5 pb-24 pt-28 text-center lg:pt-32">
+          <div className="relative mx-auto flex min-h-[calc(100svh-76px)] max-w-4xl flex-col items-center justify-center px-5 pb-16 pt-12 text-center sm:min-h-[88svh] sm:pb-24 sm:pt-28 lg:pt-32">
             {/* small ornament (line only) */}
             <div aria-hidden="true" className="flex items-center">
               <span className="h-px w-28 bg-white/35" />
@@ -644,22 +649,22 @@ export function HomePage() {
 
             <h1
               id="hero-heading"
-              className="mt-8 font-display text-4xl leading-[1.15] text-white sm:text-6xl xl:text-7xl"
+              className="mt-6 text-balance font-display text-[2.4rem] leading-[1.1] text-white min-[380px]:text-[2.75rem] sm:mt-8 sm:text-6xl sm:leading-[1.15] xl:text-7xl"
             >
               A little inspiration for your{' '}
               <span className="text-[#bfe9d0]">everyday table.</span>
             </h1>
 
-            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+            <p className="mx-auto mt-5 max-w-[34ch] text-[0.95rem] leading-relaxed text-white/80 min-[480px]:max-w-md sm:mt-8 sm:max-w-2xl sm:text-lg">
               From comforting family dinners to bold, flavour packed dishes and something sweet. Discover recipes
               that make cooking at home feel exciting, simple and full of flavour, one recipe at a time.
             </p>
 
-            <div className="mt-10 flex justify-center">
+            <div className="mt-8 flex w-full max-w-xs justify-center sm:mt-10 sm:w-auto sm:max-w-none">
               <Button
                 asChild
                 size="lg"
-                className="rounded-md bg-[#16a05d] px-8 text-white hover:bg-[#12894f]"
+                className="h-12 w-full rounded-md bg-[#16a05d] px-8 text-base text-white hover:bg-[#12894f] sm:w-auto"
               >
                 <Link href="/recipes">Explore Recipes</Link>
               </Button>
@@ -670,7 +675,7 @@ export function HomePage() {
         {/* POPULAR RECIPES OF THE WEEK */}
         <section className="px-5 lg:px-8" style={PAPER} aria-labelledby="popular-heading">
           <div className="mx-auto max-w-7xl pb-16 pt-16 sm:pt-20">
-            <div className="flex items-end justify-between gap-4">
+            <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h2
                   id="popular-heading"
@@ -690,15 +695,16 @@ export function HomePage() {
               </Link>
             </div>
 
-            <ul className="mt-8 grid gap-6 sm:grid-cols-3 sm:gap-8">
+            <ul className={`mt-8 ${CAROUSEL}`}>
               {popular.map((recipe: Recipe) => (
-                <li key={recipe.id}>
+                <li key={recipe.id} className={CAROUSEL_ITEM}>
                   <Link href={`/recipe/${recipeSlug(recipe)}`} className={`group ${CARD}`}>
                     <Image
                       src={recipe.image}
                       alt={recipe.title}
                       width={600}
                       height={600}
+                      sizes={CARD_SIZES}
                       className={SQUARE_IMG}
                     />
                     <h3 className="px-2 pb-6 pt-5 text-center font-display text-lg text-[#1f4d3a] group-hover:underline group-focus-visible:underline">
@@ -747,7 +753,7 @@ export function HomePage() {
           style={PAPER}
           aria-labelledby="featured-heading"
         >
-          <div className="relative mx-auto max-w-7xl px-5 py-24 sm:py-32 lg:px-8">
+          <div className="relative mx-auto max-w-7xl px-5 py-12 sm:py-24 lg:px-8">
             <div className="grid items-center gap-10 rounded-[2rem] bg-gradient-to-br from-[#e3f0e8] to-[#cfe3d6] px-6 py-12 sm:px-12 lg:grid-cols-12 lg:gap-12 lg:px-16 lg:py-20">
               <div className="lg:col-span-6">
                 <p className="text-base text-[#2e6a4f]">
@@ -801,6 +807,7 @@ export function HomePage() {
                     alt={featured.title}
                     width={800}
                     height={800}
+                    sizes="(max-width: 640px) 85vw, (max-width: 1024px) 60vw, 448px"
                     className={SQUARE_IMG}
                   />
                 </Link>
@@ -837,7 +844,7 @@ export function HomePage() {
                       type="button"
                       aria-pressed={active}
                       onClick={() => setFilter(c)}
-                      className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e6a4f] focus-visible:ring-offset-2 ${
+                      className={`rounded-full border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e6a4f] focus-visible:ring-offset-2 ${
                         active
                           ? 'border-[#2e6a4f] bg-[#2e6a4f] text-white'
                           : 'border-[#2e6a4f]/40 text-[#1f4d3a] hover:border-[#2e6a4f]'
@@ -850,14 +857,14 @@ export function HomePage() {
               </div>
             </div>
 
-            <div key={filter} className="space-y-32">
+            <div key={filter} className="space-y-20 sm:space-y-32">
               {grouped.map((group) => (
                 <div key={group.category}>
                   {/* Category heading with a giant ghost word behind it */}
-                  <div className="relative mb-16 py-12 text-center sm:py-16">
+                  <div className="relative mb-10 py-8 text-center sm:mb-16 sm:py-16">
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 flex select-none items-center justify-center whitespace-nowrap font-display text-[5.5rem] leading-none text-[#d3e6da] sm:text-[9rem] lg:text-[13rem]"
+                      className="pointer-events-none absolute inset-0 flex select-none items-center justify-center whitespace-nowrap font-display text-[16vw] leading-none text-[#d3e6da] sm:text-[9rem] lg:text-[13rem]"
                     >
                       {group.category}
                     </div>
@@ -941,6 +948,7 @@ export function HomePage() {
                     alt={closing.title}
                     width={700}
                     height={700}
+                    sizes="(max-width: 640px) 80vw, 384px"
                     loading="lazy"
                     className={SQUARE_IMG}
                   />
@@ -1006,8 +1014,9 @@ export function HomePage() {
                       alt={dish.title}
                       width={500}
                       height={300}
+                      sizes="(max-width: 768px) 90vw, 33vw"
                       loading="lazy"
-                      className="mt-4 aspect-[3/4] w-full object-cover"
+                      className="mt-4 aspect-[16/10] w-full object-cover md:aspect-[3/4]"
                     />
                   </li>
                 )
@@ -1092,9 +1101,9 @@ export function HomePage() {
               </Link>
             </div>
 
-            <ul className="mt-10 grid gap-6 sm:grid-cols-3 sm:gap-8">
+            <ul className={`mt-10 ${CAROUSEL}`}>
               {trending.map((recipe: Recipe) => (
-                <li key={recipe.id}>
+                <li key={recipe.id} className={CAROUSEL_ITEM}>
                   <Link href={`/recipe/${recipeSlug(recipe)}`} className={`group ${CARD}`}>
                     <div className="relative">
                       <Image
@@ -1102,6 +1111,7 @@ export function HomePage() {
                         alt={recipe.title}
                         width={600}
                         height={600}
+                        sizes={CARD_SIZES}
                         loading="lazy"
                         className={SQUARE_IMG}
                       />
