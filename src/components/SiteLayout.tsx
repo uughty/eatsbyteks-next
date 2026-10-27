@@ -146,7 +146,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         <nav
           id="mobile-menu"
           aria-label="Mobile navigation"
-          className={`absolute inset-x-0 top-full max-h-[calc(100svh-76px)] overflow-y-auto overscroll-contain border-b border-[#123222]/15 bg-[#cfe3c0] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_30px_40px_-30px_rgba(18,50,34,0.6)] transition-all duration-300 lg:hidden ${
+          className={`absolute inset-x-0 top-full max-h-[calc(100vh-76px)] supports-[height:100svh]:max-h-[calc(100svh-76px)] overflow-y-auto overscroll-contain border-b border-[#123222]/15 bg-[#cfe3c0] px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_30px_40px_-30px_rgba(18,50,34,0.6)] transition-all duration-300 lg:hidden ${
             open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0'
           }`}
         >

@@ -566,7 +566,7 @@ function CookieBanner() {
       role="dialog"
       aria-live="polite"
       aria-label="Cookie consent"
-      className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 mx-auto max-h-[70svh] max-w-3xl overflow-y-auto rounded-2xl bg-white p-4 shadow-[0_20px_50px_-15px_rgba(31,77,58,0.55)] ring-1 ring-[#2e6a4f]/15 sm:inset-x-6 sm:bottom-4 sm:p-6"
+      className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 mx-auto max-h-[70vh] max-w-3xl overflow-y-auto rounded-2xl bg-white p-4 shadow-[0_20px_50px_-15px_rgba(31,77,58,0.55)] ring-1 ring-[#2e6a4f]/15 sm:inset-x-6 sm:bottom-4 sm:p-6"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
         <div>
@@ -625,7 +625,7 @@ export function HomePage() {
 
   return (
     <SiteLayout>
-      <main className="overflow-x-clip">
+      <main className="overflow-x-hidden">
         {/* HERO: text only, one centred block on the original green */}
         <section
           className="relative isolate overflow-hidden bg-[#2e6a4f]"
@@ -641,7 +641,7 @@ export function HomePage() {
             className="pointer-events-none absolute -z-10 bottom-0 left-[40%] h-[42%] w-[22%] bg-black/[0.06]"
           />
 
-          <div className="relative mx-auto flex min-h-[calc(100svh-76px)] max-w-4xl flex-col items-center justify-center px-5 pb-16 pt-12 text-center sm:min-h-[88svh] sm:pb-24 sm:pt-28 lg:pt-32">
+          <div className="relative mx-auto flex min-h-[calc(100vh-76px)] supports-[height:100svh]:min-h-[calc(100svh-76px)] max-w-4xl flex-col items-center justify-center px-5 pb-16 pt-12 text-center sm:min-h-[88vh] sm:supports-[height:100svh]:min-h-[88svh] sm:pb-24 sm:pt-28 lg:pt-32">
             {/* small ornament (line only) */}
             <div aria-hidden="true" className="flex items-center">
               <span className="h-px w-28 bg-white/35" />
@@ -749,7 +749,7 @@ export function HomePage() {
 
         {/* FEATURED: one large rounded panel with a square photo */}
         <section
-          className="relative overflow-x-clip"
+          className="relative overflow-x-hidden"
           style={PAPER}
           aria-labelledby="featured-heading"
         >
@@ -818,7 +818,7 @@ export function HomePage() {
 
         {/* LATEST: category → subcategory → dishes, as alternating panels */}
         <section
-          className="scroll-mt-20 overflow-x-clip"
+          className="scroll-mt-20 overflow-x-hidden"
           style={PAPER_GREEN}
           aria-labelledby="latest-heading"
         >
@@ -912,7 +912,7 @@ export function HomePage() {
 
         {/* CLOSING: panel with a square photo */}
         <section
-          className="relative overflow-x-clip"
+          className="relative overflow-x-hidden"
           style={PAPER}
           aria-labelledby="closing-heading"
         >
@@ -1065,7 +1065,7 @@ export function HomePage() {
             <div className="mt-10 divide-y divide-[#2e6a4f]/20 border-y border-[#2e6a4f]/20">
               {FAQS.map((f) => (
                 <details key={f.q} className="group py-5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg text-[#1f4d3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e6a4f]">
+                  <summary className="flex cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between gap-4 font-display text-lg text-[#1f4d3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2e6a4f]">
                     {f.q}
                     <span
                       aria-hidden="true"
