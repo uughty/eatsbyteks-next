@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { SiteLayout } from '@/components/SiteLayout'
 import { RecipeDialog } from '@/components/RecipeDialog'
+import { RecipeActions } from '@/components/RecipeActions'
 import { recipeSlug, recipes } from '@/lib/recipes'
 import type { Recipe } from '@/lib/recipes'
 import { useRecipeShelf } from '@/lib/useRecipeShelf'
@@ -252,6 +253,8 @@ function DishRow({
               {saved ? 'Saved' : 'Save'}
             </button>
           </div>
+
+          <RecipeActions recipe={recipe} className="mt-4" />
         </div>
       </div>
     </article>
@@ -795,6 +798,8 @@ export function HomePage() {
                     Quick view
                   </Button>
                 </div>
+
+                <RecipeActions recipe={featured} className="mt-4" />
               </div>
 
               <div className="lg:col-span-6">

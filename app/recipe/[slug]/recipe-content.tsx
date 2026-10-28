@@ -76,7 +76,11 @@ function SiteFooter() {
   }
 
   return (
-    <footer className="relative" style={{ backgroundColor: '#faf6e8' }} aria-label="Site footer">
+    <footer
+      className="relative print:hidden"
+      style={{ backgroundColor: '#faf6e8' }}
+      aria-label="Site footer"
+    >
       <svg
         viewBox="0 0 1440 120"
         preserveAspectRatio="none"
@@ -519,7 +523,10 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
           </div>
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
-            <article className="rounded-[2.5rem] bg-[#fbf9ef] p-7 shadow-[0_40px_80px_-40px_rgba(18,50,34,0.5)] ring-1 ring-[#d3e5c5] sm:p-10">
+            <article
+              id="recipe-card"
+              className="rounded-[2.5rem] bg-[#fbf9ef] p-7 shadow-[0_40px_80px_-40px_rgba(18,50,34,0.5)] ring-1 ring-[#d3e5c5] sm:p-10"
+            >
               <div className="flex items-center gap-4 text-sm text-[#123222]/60">
                 <span>{recipe.category}</span>
                 <span className="h-px flex-1 bg-[#123222]/20" />
@@ -536,7 +543,10 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
                 {recipe.description}
               </p>
 
-              <div className="mt-10 flex items-center justify-between gap-3 border-b border-[#123222]/15 pb-3">
+              <div
+                id="recipe"
+                className="mt-10 flex scroll-mt-6 items-center justify-between gap-3 border-b border-[#123222]/15 pb-3"
+              >
                 
 
                 <div className="inline-flex items-center gap-1 rounded-full bg-white p-1 ring-1 ring-[#cfe3c0]">
@@ -600,7 +610,10 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
 
               {steps.length > 0 && (
                 <>
-                  <div className="mt-12 flex items-center justify-between gap-3 border-b border-[#123222]/15 pb-3">
+                  <div
+                    id="method"
+                    className="mt-12 flex scroll-mt-6 items-center justify-between gap-3 border-b border-[#123222]/15 pb-3"
+                  >
                     <h2 className="inline-flex items-center gap-2 font-display text-2xl text-[#123222]">
                       <ListChecks size={20} className="text-[#2f6a45]" />
                       Method
@@ -610,14 +623,14 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
                       <button
                         type="button"
                         onClick={() => setDone([])}
-                        className="text-sm font-semibold text-[#2f6a45] hover:underline"
+                        className="text-sm font-semibold text-[#2f6a45] hover:underline print:hidden"
                       >
                         Reset steps
                       </button>
                     )}
                   </div>
 
-                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#dcebc9]">
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#dcebc9] print:hidden">
                     <div
                       className="h-full rounded-full bg-[#2f6a45] transition-[width] duration-500"
                       style={{ width: `${progress}%` }}
@@ -674,7 +687,7 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
               </div>
             </article>
 
-            <aside className="lg:sticky lg:top-8 lg:self-start">
+            <aside className="lg:sticky lg:top-8 lg:self-start print:hidden">
               <div className="relative">
                 <div className="rounded-[2.5rem] bg-[#f6f1c4] p-3 shadow-[0_50px_90px_-40px_rgba(18,50,34,0.7)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -754,7 +767,7 @@ function RecipeView({ recipe }: { recipe: Recipe }) {
           )}
         </div>
 
-        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center">
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center print:hidden">
           {notice && (
             <span className="rounded-full bg-[#123222] px-5 py-2.5 text-sm font-semibold text-[#f6f1c4] shadow-xl">
               {notice}
